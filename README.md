@@ -62,5 +62,5 @@ Personal data and analytics portfolio showcasing work in Power BI, Tableau, Pyth
 ## Connect
 
 - [LinkedIn](https://www.linkedin.com/in/cameron-batts)
-- [GitHub](https://github.com/cameronbatts)
+- [GitHub](https://github.com/cameron-batts)
 - Email: cambatts1988@gmail.com
