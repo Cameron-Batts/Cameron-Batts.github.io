@@ -1,6 +1,6 @@
 # Cameron Batts | Data & Analytics Portfolio
 
-**Live Site:** [cameronbatts.github.io](https://cameronbatts.github.io)
+**Live Site:** [cameron-batts.github.io](https://cameron-batts.github.io)
 
 ---
 
