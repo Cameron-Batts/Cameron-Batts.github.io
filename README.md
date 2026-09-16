@@ -54,8 +54,9 @@ Personal data and analytics portfolio showcasing work in Power BI, Tableau, Pyth
 
 ## Education
 
-- MS Quantitative Management (Business Analytics) -- Duke University, Fuqua School of Business *(in progress)*
+- MS Quantitative Management (Business Analytics) -- Duke University, Fuqua School of Business 
 - MBA -- University of Illinois, Gies College of Business
+- BA Healthcare Administration -- Ashford University
 
 ---
 
