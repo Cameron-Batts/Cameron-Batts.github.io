@@ -39,7 +39,7 @@ CrowdFlower: https://data.world/crowdflower/sentiment-analysis-in-text . Retain 
 
 ## Files
 - `notebooks/multiclass_sentiment_classification.ipynb`: cleaned analysis and original numerical outputs.
-- `reports/multiclass_sentiment_classification.html`: readable report.
+- [Live analysis report](https://cameron-batts.github.io/multiclass_sentiment_classification.html).
 - `reports/model_comparison.csv`: baseline test metrics.
 - `data/emotion_counts.csv`: aggregate original emotion counts.
 - `requirements.txt`: dependencies.
