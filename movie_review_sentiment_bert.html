@@ -1,0 +1,243 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Movie Review Sentiment BERT | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.65 system-ui}main{max-width:950px;margin:auto;padding:32px 24px}h1{font:bold 2.4rem Georgia}h2{border-bottom:2px solid #e8c97a;margin-top:36px}pre{padding:18px;background:white;border-left:3px solid #c9a84c;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin:16px 0}summary{cursor:pointer}p{overflow-wrap:anywhere}a{color:#1a3560}</style><main><a href="/">← Portfolio</a><h1>Movie Review Sentiment Classification with BERT</h1><p><strong>Portfolio presentation: Cameron Batts</strong></p><p>Collaborative project. Individual contributions are not specified in the supplied notebook; this presentation does not claim sole authorship.</p><p>Python · NLP · Transformers · PyTorch · Naive Bayes · Logistic Regression</p><h2>Overview</h2><p>Compare bag-of-words classifiers with a fully fine-tuned BERT model for binary sentiment classification of Rotten Tomatoes reviews. Preserve the dataset&#x27;s predefined training, validation and test splits and compare all models on the same 1,066-review test set.</p><h2>Business context</h2><p>Review classification can support content triage and aggregate audience-feedback analysis. This study measures benchmark classification performance rather than a deployed business outcome.</p><h2>Data and source identifiers</h2><p>Hugging Face dataset: `cornell-movie-review-data/rotten_tomatoes`, https://huggingface.co/datasets/cornell-movie-review-data/rotten_tomatoes . Model checkpoint: `MarieAngeA13/Sentiment-Analysis-BERT`. These identifiers are retained for attribution and reproducibility. Raw reviews and person-name examples are not bundled.</p><h2>Execution status</h2><p>Selected numerical outputs are retained from the supplied team notebook. The cleaned code is syntax-checked but not rerun; trained weights are not included. Performance is from one reported run, not independent reproduction.</p><details><summary>Python code</summary><pre># General dataframe imports
+import numpy as np
+import pandas as pd
+pd.set_option(&quot;display.max_colwidth&quot;, None)
+
+# sklearn imports
+from sklearn.metrics import classification_report, accuracy_score
+from sklearn import naive_bayes
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Plotting
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Hugging Face/BERT imports
+from datasets import load_dataset
+import torch
+from torch.utils.data import Dataset
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments</pre></details><h2>Dataset splits</h2><p>Load the source dataset at runtime. It provides 8,530 training, 1,066 validation and 1,066 test reviews. Training labels are balanced: 4,265 per class; test support is 533 per class. Labels are 0=negative and 1=positive. Dataset and model downloads require internet access.</p><details><summary>Python code</summary><pre># Download the dataset
+dataset = load_dataset(&quot;cornell-movie-review-data/rotten_tomatoes&quot;)
+
+# Store each split as a pandas dataframe
+train_df = dataset[&quot;train&quot;].to_pandas()
+val_df = dataset[&quot;validation&quot;].to_pandas()
+test_df = dataset[&quot;test&quot;].to_pandas()
+
+print(&quot;Training observations:&quot;, len(train_df))
+print(&quot;Validation observations:&quot;, len(val_df))
+print(&quot;Testing observations:&quot;, len(test_df))</pre></details><details><summary>Python code</summary><pre>for frame in [train_df, val_df, test_df]:
+    frame[&#x27;sentiment&#x27;] = frame[&#x27;label&#x27;].map({0: &#x27;negative&#x27;, 1: &#x27;positive&#x27;})
+print(train_df[&#x27;sentiment&#x27;].value_counts())
+</pre></details><details><summary>Python code</summary><pre># Set up X and y for each split
+X_train = train_df[&quot;text&quot;]
+y_train = train_df[&quot;label&quot;]
+
+X_val = val_df[&quot;text&quot;]
+y_val = val_df[&quot;label&quot;]
+
+X_test = test_df[&quot;text&quot;]
+y_test = test_df[&quot;label&quot;]
+
+print(&quot;X_train:&quot;, X_train.shape)
+print(&quot;X_val:&quot;, X_val.shape)
+print(&quot;X_test:&quot;, X_test.shape)</pre></details><pre>X_train: (8530,)
+X_val: (1066,)
+X_test: (1066,)
+</pre><h2>Bag-of-words representation</h2><p>Use unigrams and bigrams with English stopword removal. Fit the vocabulary on training text only and reuse it for validation and test transformations. The original vocabulary contains 83,753 features. Stopword removal can suppress sentiment cues such as negation, so its effect deserves validation.</p><details><summary>Python code</summary><pre>from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = CountVectorizer(ngram_range=(1, 2), stop_words=&quot;english&quot;)
+
+# Fit only on the training data
+X_train_vectors = vectorizer.fit_transform(X_train)
+
+# Transform validation and test data using the training vocabulary
+X_val_vectors = vectorizer.transform(X_val)
+X_test_vectors = vectorizer.transform(X_test)
+
+print(&quot;Vocabulary size:&quot;, len(vectorizer.get_feature_names_out()))</pre></details><pre>Vocabulary size: 83753
+</pre><h2>Naive Bayes baseline</h2><details><summary>Python code</summary><pre># Train the Naive Bayes model
+model_nb = naive_bayes.MultinomialNB()
+model_nb.fit(X_train_vectors, y_train)
+
+# Predict the testing data
+y_pred_nb = model_nb.predict(X_test_vectors)
+
+# Display performance
+print(classification_report(
+    y_test,
+    y_pred_nb,
+    target_names=[&quot;negative&quot;, &quot;positive&quot;],
+    digits=4,
+    zero_division=0.0
+))</pre></details><pre>              precision    recall  f1-score   support
+
+    negative     0.7761    0.7805    0.7783       533
+    positive     0.7792    0.7749    0.7770       533
+
+    accuracy                         0.7777      1066
+   macro avg     0.7777    0.7777    0.7777      1066
+weighted avg     0.7777    0.7777    0.7777      1066
+
+</pre><h2>Logistic regression baseline</h2><details><summary>Python code</summary><pre># Train the Logistic Regression model
+model_lr = LogisticRegression(max_iter=1000)
+model_lr.fit(X_train_vectors, y_train)
+
+# Predict the testing data
+y_pred_lr = model_lr.predict(X_test_vectors)
+
+# Display performance
+print(classification_report(
+    y_test,
+    y_pred_lr,
+    target_names=[&quot;negative&quot;, &quot;positive&quot;],
+    digits=4,
+    zero_division=0.0
+))</pre></details><pre>              precision    recall  f1-score   support
+
+    negative     0.7646    0.7617    0.7632       533
+    positive     0.7626    0.7655    0.7640       533
+
+    accuracy                         0.7636      1066
+   macro avg     0.7636    0.7636    0.7636      1066
+weighted avg     0.7636    0.7636    0.7636      1066
+
+</pre><h2>BERT setup</h2><p>Use the checkpoint and tokenizer from the original analysis. CUDA is selected when available, otherwise CPU. The reported run used a Tesla T4 GPU; runtime is hardware-dependent.</p><details><summary>Python code</summary><pre># BERT model and tokenizer
+bert_path = &quot;MarieAngeA13/Sentiment-Analysis-BERT&quot;
+bert_tokenizer = AutoTokenizer.from_pretrained(bert_path)
+
+# Check whether a GPU is available
+device = &quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;
+print(&quot;Device:&quot;, device)
+
+if torch.cuda.is_available():
+    print(&quot;GPU:&quot;, torch.cuda.get_device_name(0))</pre></details><details><summary>Python code</summary><pre># Function to tokenize and convert the data to tensors
+def tokenize_and_tensorize(data, labels, tokenizer):
+    tokens = tokenizer(
+        data.tolist(),
+        padding=True,
+        truncation=True,
+        return_tensors=&quot;pt&quot;
+    )
+
+    labels_tensor = torch.tensor(labels.tolist())
+
+    return {
+        &quot;input_ids&quot;: tokens[&quot;input_ids&quot;],
+        &quot;attention_mask&quot;: tokens[&quot;attention_mask&quot;]
+    }, labels_tensor
+
+
+train_encodings, y_train_tensor = tokenize_and_tensorize(
+    X_train, y_train, bert_tokenizer
+)
+
+val_encodings, y_val_tensor = tokenize_and_tensorize(
+    X_val, y_val, bert_tokenizer
+)
+
+test_encodings, y_test_tensor = tokenize_and_tensorize(
+    X_test, y_test, bert_tokenizer
+)</pre></details><details><summary>Python code</summary><pre>class RottenTomatoesDataset(Dataset):
+    def __init__(self, encodings, labels):
+        self.encodings = encodings
+        self.labels = labels
+
+    def __getitem__(self, idx):
+        item = {
+            key: val[idx].clone().detach()
+            for key, val in self.encodings.items()
+        }
+
+        item[&quot;labels&quot;] = self.labels[idx].clone().detach()
+        return item
+
+    def __len__(self):
+        return len(self.labels)
+
+
+train_dataset = RottenTomatoesDataset(train_encodings, y_train_tensor)
+val_dataset = RottenTomatoesDataset(val_encodings, y_val_tensor)
+test_dataset = RottenTomatoesDataset(test_encodings, y_test_tensor)
+
+print(&quot;Training:&quot;, len(train_dataset))
+print(&quot;Validation:&quot;, len(val_dataset))
+print(&quot;Testing:&quot;, len(test_dataset))</pre></details><h2>Binary classification head and training</h2><p>The source checkpoint has three output classes. Requesting two labels with `ignore_mismatched_sizes=True` reinitializes the incompatible classifier weights and bias while retaining compatible encoder weights. This mismatch is an intentional task adaptation; the new head must be trained.</p><p>Fine-tune all parameters for two epochs using learning_rate=2e-5, weight_decay=0.01 and seed=42. Training batch size is 16 and evaluation batch size is 32. Save and evaluate each epoch, then select the checkpoint with lowest validation loss. CUDA runs enable fp16.</p><details><summary>Python code</summary><pre># Load BERT for binary sequence classification
+bert_model = AutoModelForSequenceClassification.from_pretrained(
+    bert_path,
+    num_labels=2,
+    id2label={0: &quot;negative&quot;, 1: &quot;positive&quot;},
+    label2id={&quot;negative&quot;: 0, &quot;positive&quot;: 1},
+    ignore_mismatched_sizes=True
+)
+
+# Training settings
+training_args = TrainingArguments(
+    output_dir=&quot;./bert_results&quot;,
+    num_train_epochs=2,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=32,
+    learning_rate=2e-5,
+    weight_decay=0.01,
+    eval_strategy=&quot;epoch&quot;,
+    save_strategy=&quot;epoch&quot;,
+    load_best_model_at_end=True,
+    metric_for_best_model=&quot;eval_loss&quot;,
+    greater_is_better=False,
+    logging_steps=100,
+    report_to=&quot;none&quot;,
+    seed=42,
+    fp16=torch.cuda.is_available()
+)
+
+trainer = Trainer(
+    model=bert_model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=val_dataset
+)</pre></details><details><summary>Python code</summary><pre># Fine-tune BERT
+trainer.train()</pre></details><h2>Held-out evaluation</h2><p>Evaluate the selected BERT checkpoint on the same predefined test split as the baselines.</p><details><summary>Python code</summary><pre># Predict the test data
+bert_output = trainer.predict(test_dataset)
+
+# Convert the model output into predicted labels
+y_pred_bert = np.argmax(bert_output.predictions, axis=1)
+
+# Display performance
+print(classification_report(
+    y_test_tensor.numpy(),
+    y_pred_bert,
+    target_names=[&quot;negative&quot;, &quot;positive&quot;],
+    digits=4,
+    zero_division=0.0
+))</pre></details><pre>              precision    recall  f1-score   support
+
+    negative     0.8857    0.7992    0.8402       533
+    positive     0.8171    0.8968    0.8551       533
+
+    accuracy                         0.8480      1066
+   macro avg     0.8514    0.8480    0.8477      1066
+weighted avg     0.8514    0.8480    0.8477      1066
+
+</pre><details><summary>Python code</summary><pre># Calculate accuracy for each model
+nb_accuracy = accuracy_score(y_test, y_pred_nb)
+lr_accuracy = accuracy_score(y_test, y_pred_lr)
+bert_accuracy = accuracy_score(y_test_tensor.numpy(), y_pred_bert)
+
+results_df = pd.DataFrame({
+    &quot;Model&quot;: [
+        &quot;Naive Bayes&quot;,
+        &quot;Logistic Regression&quot;,
+        &quot;Fine-tuned BERT&quot;
+    ],
+    &quot;Accuracy&quot;: [
+        nb_accuracy,
+        lr_accuracy,
+        bert_accuracy
+    ]
+})
+
+results_df</pre></details><pre>                 Model  Accuracy
+0          Naive Bayes  0.777674
+1  Logistic Regression  0.763602
+2      Fine-tuned BERT  0.848030</pre><h2>Results and interpretation</h2><p>Fine-tuned BERT reported accuracy 0.848030 (84.80%) and macro F1 0.8477. Naive Bayes reached 0.777674 accuracy and 0.7777 macro F1; logistic regression reached 0.763602 accuracy and 0.7636 macro F1. BERT&#x27;s accuracy gain was approximately 7.04 percentage points over Naive Bayes and 8.44 points over logistic regression.</p><p>BERT&#x27;s positive-class recall was 0.8968 and negative-class recall was 0.7992, showing an asymmetric error pattern despite balanced test support. The result supports BERT for this experiment, not a universal algorithm ranking.</p><h2>Limitations and next steps</h2><p>- The cleaned workflow was not rerun; dataset/model revisions and package versions are unpinned.</p><p>- Only one training seed and dataset split were reported. No confidence interval or significance test was computed.</p><p>- Prior checkpoint exposure to related review data has not been audited; independent performance on new reviews is unknown.</p><p>- Compare negation-preserving vectorization and tune baseline regularization on validation data.</p><p>- Audit errors, evaluate multiple seeds, and compare compute/memory requirements before deployment.</p><h2>Contribution context</h2><p>This is a team-developed analysis presented in Cameron Batts&#x27;s portfolio. The supplied notebook does not identify individual responsibilities. Shared results should be described as collaborative rather than solely authored.</p></main></html>
