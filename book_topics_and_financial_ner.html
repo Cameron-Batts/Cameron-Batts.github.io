@@ -1,0 +1,139 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Book Topics and Financial NER | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.65 system-ui}main{max-width:950px;margin:auto;padding:32px 24px}h1{font:bold 2.4rem Georgia}h2{border-bottom:2px solid #e8c97a;margin-top:36px}pre{padding:18px;background:white;border-left:3px solid #c9a84c;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin:16px 0}summary{cursor:pointer}p{overflow-wrap:anywhere}a{color:#1a3560}</style><main><a href="/">← Portfolio</a><h1>Book Topic Modeling and Financial Entity Extraction</h1><p><strong>Cameron Batts</strong></p><p>Python · NLP · Gensim · LDA · spaCy · Dependency Parsing · NER</p><h2>Overview</h2><p>Explore two complementary NLP workflows: discover themes in 16,559 book summaries with Latent Dirichlet Allocation, and inspect named entities in 4,846 financial-news sentences. Compare topic counts and training passes, interpret document mixtures, and examine entity extraction quality.</p><h2>Business context</h2><p>Topic models can support collection browsing and content organization; entity extraction can structure organizations, locations, and monetary information for document review. These are potential applications, not measured production outcomes.</p><h2>Data sources</h2><p>Book summaries: CMU Book Summary Dataset, https://www.cs.cmu.edu/~dbamman/booksummaries.html . Financial news: Malo et al. (2014), *Good debt or bad debt: Detecting semantic orientations in economic texts*, https://doi.org/10.1002/asi.23062 . Required source attribution is retained. Local CSV copies are required; raw datasets and person-name examples are not distributed in this project.</p><h2>Execution status</h2><p>Selected outputs are retained from the supplied completed notebook. The cleaned code is syntax-checked but has not been rerun. Revised span-level NER and dependency examples are clearly marked as unexecuted extensions.</p><details><summary>Python code</summary><pre>from pathlib import Path
+from collections import Counter
+import pandas as pd
+import numpy as np
+import nltk
+from gensim.models import LdaModel
+from gensim.corpora import Dictionary
+import gensim.parsing.preprocessing as preprocessing
+from gensim.utils import simple_preprocess
+
+nltk.download([&#x27;averaged_perceptron_tagger_eng&#x27;, &#x27;wordnet&#x27;], quiet=True)
+root = Path.cwd().parent if Path.cwd().name == &#x27;notebooks&#x27; else Path.cwd()
+book_df = pd.read_csv(root / &#x27;data&#x27; / &#x27;book.csv&#x27;, usecols=[&#x27;title&#x27;, &#x27;summary_name_removed&#x27;])
+book_df.dropna(subset=[&#x27;summary_name_removed&#x27;], inplace=True)
+print(&#x27;Book summaries:&#x27;, len(book_df))
+</pre></details><h2>Book preprocessing</h2><p>Use the supplied name-reduced summary column, lowercase text, remove punctuation, digits, extra whitespace and stopwords, then apply POS-aware lemmatization. Automated name removal is imperfect and can leave residual proper names in source text; raw examples are omitted from saved outputs.</p><details><summary>Python code</summary><pre>def lemmatize_text(token_list, wnl):
+  &quot;&quot;&quot;
+  This function tags the pos of the input tokens,
+  and lemmatize the tokens.
+  &quot;&quot;&quot;
+  # POS tag each word
+  for word, tag in nltk.pos_tag(token_list):
+    # Mapping the pos tags to the types supported by wnl
+    if tag.startswith(&quot;NN&quot;):
+      yield wnl.lemmatize(word, pos=&#x27;n&#x27;)
+    elif tag.startswith(&#x27;VB&#x27;):
+      yield wnl.lemmatize(word, pos=&#x27;v&#x27;)
+    elif tag.startswith(&#x27;JJ&#x27;):
+      yield wnl.lemmatize(word, pos=&#x27;a&#x27;)
+    elif tag.startswith(&#x27;RB&#x27;):
+      yield wnl.lemmatize(word, pos=&#x27;r&#x27;)
+    else:
+      yield wnl.lemmatize(word)
+
+# lower letters, remove punctuations, digits, multiple whitespaces, and stopwords
+CUSTOM_FILTERS = [lambda x: x.lower(), preprocessing.strip_punctuation, preprocessing.strip_numeric, preprocessing.strip_multiple_whitespaces, preprocessing.remove_stopwords]
+book_df[&quot;processed_summary&quot;] = book_df[&quot;summary_name_removed&quot;].apply(lambda x: preprocessing.preprocess_string(x, CUSTOM_FILTERS))
+
+# lemmatize the tokens
+wnl = nltk.WordNetLemmatizer()
+book_df[&quot;processed_summary&quot;] = book_df[&quot;processed_summary&quot;].apply(lambda x: simple_preprocess(&quot; &quot;.join(lemmatize_text(x, wnl))))</pre></details><h2>Dictionary and models</h2><p>Remove the 50 most frequent dictionary tokens. Train 5- and 10-topic LDA models with random_state=30, iterations=50 and two passes.</p><details><summary>Python code</summary><pre># create a dictionary from the processed summaries
+summary_list = book_df[&quot;processed_summary&quot;].tolist()
+book_dictionary = Dictionary(summary_list)
+# filter top 50 most frequent tokens
+book_dictionary.filter_n_most_frequent(50)
+# build the corpus for LDA training
+book_corpus = [book_dictionary.doc2bow(text) for text in summary_list]</pre></details><details><summary>Python code</summary><pre>lda_10topics = LdaModel(corpus = book_corpus, num_topics = 10, id2word = book_dictionary, passes = 2, iterations = 50, random_state = 30)</pre></details><details><summary>Python code</summary><pre>lda_5topics = LdaModel(corpus=book_corpus,num_topics=5,id2word=book_dictionary,passes=2,iterations=50,random_state=30)</pre></details><h2>Corpus-fit comparison</h2><p>The original calculation applies `2 ** (-log_perplexity)` to Gensim&#x27;s approximate per-word variational bound on the same corpus used for training. The values below are retained from that calculation. They are not held-out perplexity, classification accuracy, or a guarantee of better human-interpretable topics.</p><details><summary>Python code</summary><pre>perplexity_5 = np.exp2(-lda_5topics.log_perplexity(book_corpus))
+perplexity_10 = np.exp2(-lda_10topics.log_perplexity(book_corpus))
+
+print(&quot;Perplexity for lda_5topics:&quot;, perplexity_5)
+print(&quot;Perplexity for lda_10topics:&quot;, perplexity_10)</pre></details><pre>Perplexity for lda_5topics: 431.4382426431044
+Perplexity for lda_10topics: 548.1744954708838
+</pre><details><summary>Python code</summary><pre>lda_3passes = LdaModel(corpus=book_corpus,num_topics=10,id2word=book_dictionary,passes=3,iterations=50,random_state=30)
+lda_5passes = LdaModel(corpus=book_corpus,num_topics=10,id2word=book_dictionary,passes=5,iterations=50,random_state=30)
+
+print(&quot;Perplexity for lda_3passes:&quot;, np.exp2(-lda_3passes.log_perplexity(book_corpus)))
+print(&quot;Perplexity for lda_5passes:&quot;, np.exp2(-lda_5passes.log_perplexity(book_corpus)))</pre></details><pre>Perplexity for lda_3passes: 539.8166246114779
+Perplexity for lda_5passes: 532.5601489915963
+</pre><p>The five-topic configuration has the lowest reported corpus-fit score (431.44). For ten topics, increasing passes from two to five reduces the score from 548.17 to 532.56. This supports improved fit under the reported calculation, not an overall model-quality ranking.</p><p>Topic count should also reflect interpretability, topic coherence, stability and browsing needs. Five broad topics can suit an overview; ten topics can provide finer distinctions. A held-out split would strengthen evaluation.</p><h2>Broad topic inspection</h2><p>The original five-topic output suggests family/school, narrative/history, science fiction/space, fantasy/conflict, and war/government themes. These names are human interpretations, not learned genre labels.</p><details><summary>Python code</summary><pre>lda_5topics.print_topics(num_words=10)</pre></details><pre>[(0,
+  &#x27;0.008*&quot;mother&quot; + 0.005*&quot;house&quot; + 0.005*&quot;child&quot; + 0.005*&quot;school&quot; + 0.005*&quot;get&quot; + 0.005*&quot;mr&quot; + 0.004*&quot;girl&quot; + 0.004*&quot;want&quot; + 0.004*&quot;say&quot; + 0.003*&quot;wife&quot;&#x27;),
+ (1,
+  &#x27;0.007*&quot;character&quot; + 0.007*&quot;chapter&quot; + 0.005*&quot;write&quot; + 0.004*&quot;include&quot; + 0.004*&quot;author&quot; + 0.003*&quot;human&quot; + 0.003*&quot;state&quot; + 0.003*&quot;society&quot; + 0.003*&quot;history&quot; + 0.003*&quot;experience&quot;&#x27;),
+ (2,
+  &#x27;0.009*&quot;ship&quot; + 0.007*&quot;earth&quot; + 0.007*&quot;human&quot; + 0.005*&quot;planet&quot; + 0.005*&quot;attack&quot; + 0.004*&quot;destroy&quot; + 0.004*&quot;group&quot; + 0.004*&quot;crew&quot; + 0.004*&quot;escape&quot; + 0.004*&quot;space&quot;&#x27;),
+ (3,
+  &#x27;0.005*&quot;king&quot; + 0.005*&quot;attack&quot; + 0.005*&quot;escape&quot; + 0.004*&quot;power&quot; + 0.004*&quot;fight&quot; + 0.004*&quot;city&quot; + 0.004*&quot;battle&quot; + 0.003*&quot;dragon&quot; + 0.003*&quot;magic&quot; + 0.003*&quot;save&quot;&#x27;),
+ (4,
+  &#x27;0.012*&quot;war&quot; + 0.005*&quot;state&quot; + 0.004*&quot;american&quot; + 0.003*&quot;order&quot; + 0.003*&quot;soldier&quot; + 0.003*&quot;german&quot; + 0.003*&quot;government&quot; + 0.003*&quot;army&quot; + 0.003*&quot;country&quot; + 0.003*&quot;general&quot;&#x27;)]</pre><details><summary>Python code</summary><pre># Inspect the finer model after running; source-data names can appear in generated topics.
+lda_10topics.print_topics(num_words=10)
+</pre></details><h2>Document mixtures</h2><p>Use positional corpus entries for three illustrative documents. The original top reported topic weights were 0.4063 for topic 0 at position 565, 0.5200 for topic 0 at position 480, and 0.3998 for topic 8 at position 532. These documents are part of the training corpus, not independent test cases. Topic weights describe mixtures rather than classification accuracy. Default minimum-probability filtering can omit small topic weights.</p><details><summary>Python code</summary><pre>lda_10topics.get_document_topics(book_corpus[565])</pre></details><pre>[(0, np.float32(0.4063105)),
+ (5, np.float32(0.24081337)),
+ (7, np.float32(0.05714036)),
+ (9, np.float32(0.2935348))]</pre><details><summary>Python code</summary><pre>lda_10topics.get_document_topics(book_corpus[480])</pre></details><pre>[(0, np.float32(0.5200495)),
+ (3, np.float32(0.08573937)),
+ (5, np.float32(0.22500263)),
+ (7, np.float32(0.09766823)),
+ (9, np.float32(0.07048357))]</pre><details><summary>Python code</summary><pre>lda_10topics.get_document_topics(book_corpus[532])</pre></details><pre>[(1, np.float32(0.23165683)),
+ (2, np.float32(0.29009607)),
+ (7, np.float32(0.07623465)),
+ (8, np.float32(0.3997975))]</pre><h2>Interpretation</h2><p>The original review found that family and school vocabulary could dominate a fantasy-oriented document. Topic models group co-occurring words and do not necessarily reproduce human genre categories. LDA estimates nonnegative document-topic mixtures, whereas latent semantic indexing uses a lower-rank algebraic representation; either approach needs task-specific evaluation. Topics alone should not be assumed to represent positive, neutral or negative sentiment.</p><h2>Dependency parsing: new illustrative example</h2><p>Install the spaCy language model separately. The following neutral example replaces personal names and course-specific text; no original output is claimed for this revised sentence.</p><details><summary>Python code</summary><pre>import spacy
+from spacy import displacy
+nlp = spacy.load(&#x27;en_core_web_md&#x27;)
+doc = nlp(&#x27;The analyst reviewed the report before the meeting.&#x27;)
+parse_table = pd.DataFrame([(t.text, t.pos_, t.tag_, t.ent_type_, t.dep_) for t in doc],
+                          columns=[&#x27;TOKEN&#x27;, &#x27;POS&#x27;, &#x27;TAG&#x27;, &#x27;ENTITYTYPE&#x27;, &#x27;DEPENDENCY&#x27;])
+print(parse_table)
+displacy.render(doc, style=&#x27;dep&#x27;, jupyter=True, options={&#x27;distance&#x27;: 100})
+</pre></details><h2>Financial-news baseline</h2><p>Read the local headerless Latin-1 CSV. The original baseline strips punctuation, numbers, stopwords and single-letter tokens before spaCy. This can erase amounts and disrupt names and entity boundaries. It then counts tokens tagged MONEY, GPE or ORG, rather than complete entity spans.</p><details><summary>Python code</summary><pre>news_df = pd.read_csv(root / &#x27;data&#x27; / &#x27;all-data.csv&#x27;, header=None, usecols=[1], names=[&#x27;content&#x27;], encoding=&#x27;latin-1&#x27;)
+print(&#x27;News sentences:&#x27;, len(news_df))
+</pre></details><details><summary>Python code</summary><pre># We next do several necessary preprocessing steps on the dataset, which removes punctuation, digits, stopwords and single-letter words
+# You can run the code without any edits needed.
+CUSTOM_FILTERS = [preprocessing.strip_punctuation, preprocessing.strip_numeric, preprocessing.remove_stopwords, lambda x: preprocessing.strip_short(x, minsize=2)]
+news_df[&quot;processed_content&quot;] = news_df[&quot;content&quot;].apply(lambda x: &#x27; &#x27;.join(preprocessing.preprocess_string(x, CUSTOM_FILTERS)))</pre></details><details><summary>Python code</summary><pre>news_df[&quot;nlp&quot;] = news_df[&quot;processed_content&quot;].apply(nlp)</pre></details><details><summary>Python code</summary><pre># find the &quot;MONEY&quot; entities in each sentence
+news_df[&quot;money&quot;] = news_df[&#x27;nlp&#x27;].apply(lambda doc: [token.text for token in doc if token.ent_type_ == &quot;MONEY&quot;])
+# return the top-10 frequent entities
+news_df[&quot;money&quot;].explode().value_counts()[:10]</pre></details><pre>money
+mln              168
+million          162
+EUR              149
+euro              94
+USD               39
+billion           37
+quarter           13
+bn                11
+US                11
+approximately     11
+Name: count, dtype: int64</pre><details><summary>Python code</summary><pre>news_df[&quot;GPE&quot;] = news_df[&#x27;nlp&#x27;].apply(lambda doc: [token.text for token in doc if token.ent_type_ == &quot;GPE&quot;])
+news_df[&quot;GPE&quot;].explode().value_counts()[:10]
+</pre></details><pre>GPE
+Finland       261
+mn            125
+Russia         78
+Sweden         40
+China          38
+US             37
+St             29
+Petersburg     26
+UK             25
+Estonia        21
+Name: count, dtype: int64</pre><details><summary>Python code</summary><pre>news_df[&quot;ORG&quot;] = news_df[&#x27;nlp&#x27;].apply(lambda doc: [token.text for token in doc if token.ent_type_ == &quot;ORG&quot;])
+news_df[&quot;ORG&quot;].explode().value_counts()[:10]</pre></details><pre>ORG
+Group          152
+EUR            137
+Nokia          120
+mn             110
+Corporation    103
+Helsinki        96
+Bank            83
+OMX             80
+Oy              72
+Finland         64
+Name: count, dtype: int64</pre><h2>Entity-quality findings</h2><p>The baseline&#x27;s MONEY-token list includes mln (168), million (162), and EUR (149), which are fragments or units rather than complete monetary amounts. GPE counts include Finland (261) but also mn (125); ORG counts include Nokia (120), EUR (137), and Finland (64). These examples expose tagging errors and preprocessing artifacts, not validated entity statistics. Some labels depend on sentence context.</p><p>Because numbers were stripped and spans were split into tokens, these results cannot reliably answer questions about monetary amounts or entity mention counts.</p><h2>Extension: preserve text and count complete spans</h2><p>This revised workflow runs spaCy on the original sentences and counts complete `doc.ents` spans for selected categories. It has not been executed during portfolio preparation. Manual validation, normalization and labeled evaluation are still needed.</p><details><summary>Python code</summary><pre>span_counts = {label: Counter() for label in [&#x27;MONEY&#x27;, &#x27;GPE&#x27;, &#x27;ORG&#x27;]}
+for document in nlp.pipe(news_df[&#x27;content&#x27;].astype(str), batch_size=64):
+    for entity in document.ents:
+        if entity.label_ in span_counts:
+            span_counts[entity.label_][entity.text] += 1
+for label, counts in span_counts.items():
+    print(label, counts.most_common(10))
+</pre></details><h2>Limitations and next steps</h2><p>- Evaluate LDA on held-out documents and inspect coherence and topic stability; two passes may be insufficient.</p><p>- Name-reduced summaries can retain names; removing the most frequent tokens may also remove useful signals.</p><p>- Inspect alignment when changing filtering or indexing of book rows.</p><p>- Validate NER on original text with complete spans and manually reviewed examples.</p><p>- No genre-classification accuracy, NER precision/recall or business impact was measured.</p><h2>Author</h2><p>Cameron Batts</p></main></html>
