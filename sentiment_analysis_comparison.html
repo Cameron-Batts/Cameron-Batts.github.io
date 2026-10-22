@@ -1,106 +1,39 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sentiment Analysis | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.7 system-ui}main{max-width:900px;margin:auto;padding:40px 24px}h1{font-family:Georgia,serif;font-size:2.4rem}h2{margin-top:40px;border-bottom:2px solid #e8c97a}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:18px;background:#e8eaed;border-radius:8px;font-size:13px}.output{background:#fff;border-left:4px solid #c9a84c}details{margin:16px 0}summary{cursor:pointer;color:#1a3560}p{overflow-wrap:anywhere}</style><main><h1>Comparing Sentiment Analysis Methods on Social Media Text</h1><p><strong>Cameron Batts</strong></p><p>Python · NLP · Naive Bayes · Logistic Regression · VADER · TextBlob</p><h2>Project overview</h2><p>Compare supervised text classifiers with lexicon-based sentiment scoring using public NLTK Twitter samples. The analysis explores model behavior, vocabulary coverage, and sensitivity to emotionally loaded words.</p><p>The proposed business application is radiology patient-feedback analysis. This is a methods demonstration on public tweets, not a deployment or evaluation on patient data.</p><p>Selected aggregate outputs are retained from the supplied analysis; text examples containing third-party names and handles are not included as saved outputs. Rerunning the notebook loads the original public corpus and can display those names. The workflow has not been re-executed during portfolio preparation.<br></p><h2>Business context</h2><p>Patient feedback about check-in, wait times, staff communication, and exam experience could help healthcare leaders identify service concerns. Potential measures include patient satisfaction, complaint trends, wait times, and turnaround times. These are proposed uses and measures, not demonstrated improvements.</p><p>Sarcasm, mixed sentiment, and domain-specific language require careful interpretation and human review.</p><h2>Data and environment</h2><p>The unlabeled analysis corpus contains 20,000 tweets. Separate positive and negative corpora train the classifiers. Install dependencies from `requirements.txt` before running. NLTK downloads require internet access.</p><p>Data source: NLTK `twitter_samples` (https://www.nltk.org/nltk_data/). Tweet content is loaded at runtime rather than bundled. Preserve applicable corpus terms and attribution.</p><details><summary>Python code</summary><pre>import pandas as pd
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
-from textblob import TextBlob
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-</pre></details><details><summary>Python code</summary><pre># Public NLTK Twitter samples; no patient data is used.
-nltk.download(&#x27;twitter_samples&#x27;, quiet=True)
-from nltk.corpus import twitter_samples
-sample_df = pd.DataFrame({&#x27;text&#x27;: twitter_samples.strings(&#x27;tweets.20150430-223406.json&#x27;)})
-positive_df = pd.DataFrame({&#x27;text&#x27;: twitter_samples.strings(&#x27;positive_tweets.json&#x27;)})
-negative_df = pd.DataFrame({&#x27;text&#x27;: twitter_samples.strings(&#x27;negative_tweets.json&#x27;)})
-</pre></details><h2>Text length profile</h2><p>The original run reported an average of 121.51 characters across 20,000 tweets.</p><details><summary>Python code</summary><pre>sample_df[&#x27;text_length&#x27;] = sample_df[&#x27;text&#x27;].apply(len)
-print(sample_df[&#x27;text_length&#x27;].describe())</pre></details><pre class="output">count    20000.000000
-mean       121.508800
-std         27.536847
-min          4.000000
-25%        111.000000
-50%        137.000000
-75%        140.000000
-max        152.000000
-Name: text_length, dtype: float64
-</pre><h2>Naive Bayes baseline</h2><p>Fit a bag-of-words classifier on the labeled corpora and score the separate unlabeled corpus. Positive-class probabilities are model estimates, not measured correctness.</p><details><summary>Python code</summary><pre>positive_df[&#x27;y&#x27;] = 1
-negative_df[&#x27;y&#x27;] = 0
-labeled_df = pd.concat([positive_df, negative_df])
-
-
-X = labeled_df[&#x27;text&#x27;]
-y = labeled_df[&#x27;y&#x27;]
-vectorizer = CountVectorizer()
-X_v = vectorizer.fit_transform(X)
-model_nb = MultinomialNB()
-model_nb.fit(X_v, y)</pre></details><details><summary>Python code</summary><pre>X_sample = sample_df[&#x27;text&#x27;]
-X_sample_v = vectorizer.transform(X_sample)
-
-# Compute probabilities using the NB model, on the sample tweets - this returns (gives us) a array (20000x2) for 20,000 tweets for my two classes (negative and positive)
-y_sample_pred_probs = model_nb.predict_proba(X_sample_v)
-
-# To make it easier to manipulate the data, we are going to convert that array (list) to a DataFrame which makes it easier to work with.
-probs_df = pd.DataFrame(y_sample_pred_probs)
-
-#Attach/copy the predicted probability for each of the tweet being positive
-sample_df[&#x27;NBPosScore&#x27;] = probs_df[1]
-
-#Drop all columns except the tweets and NBPosScore
-sample_df = sample_df[[&#x27;text&#x27;,&#x27;NBPosScore&#x27;]]</pre></details><details><summary>Python code</summary><pre>print(f&quot;Vocabulary Size: {len(vectorizer.get_feature_names_out())}&quot;)</pre></details><pre class="output">Vocabulary Size: 20770
-</pre><h2>Qualitative ranking review</h2><p>The original inspection found that high positive scores could occur for spam-like or sarcastic text. Bag-of-words Naive Bayes does not explicitly model word order or context, and its conditional independence assumption limits interpretation. The 20,770-feature vocabulary reflects the training corpus and vectorizer settings.</p><p>No ground-truth labels are supplied for the 20,000-tweet analysis corpus, so this notebook does not establish accuracy or superiority over other methods.</p><h2>Prebuilt analyzers</h2><p>TextBlob polarity and VADER compound scores range from −1 to 1; they are not on the same scale as classifier probabilities. Their sensitivity to positive words does not establish better accuracy.</p><details><summary>Python code</summary><pre># SentimentIntensityAnalyzer is a VADER sentiment analysis tool from nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
-nltk.download(&#x27;vader_lexicon&#x27;)
-
-# TextBlob provides a simple API for common NLP tasks
-from textblob import TextBlob</pre></details><details><summary>Python code</summary><pre># TextBlob scores
-sample_df[&#x27;TBScore&#x27;] = sample_df[&#x27;text&#x27;].apply(lambda x: TextBlob(x).sentiment.polarity)
-
-# SIA scores
-sia = SentimentIntensityAnalyzer()
-sample_df[&#x27;SIAScore&#x27;] = sample_df[&#x27;text&#x27;].apply(lambda x: sia.polarity_scores(x)[&#x27;compound&#x27;])
-
-</pre></details><h2>Emoticon coverage</h2><p>An explicit emoticon lexicon provides a transparent, narrow baseline. Matching is substring-based and can produce false positives.</p><details><summary>Python code</summary><pre>#positive_lexicons
-positive_lexicons = [ &#x27;:-)&#x27;, &#x27;:)&#x27;, &#x27;;)&#x27;, &#x27;:o)&#x27;, &#x27;:]&#x27;, &#x27;:3&#x27;, &#x27;:c)&#x27;, &#x27;:&gt;&#x27;, &#x27;=]&#x27;, &#x27;8)&#x27;, &#x27;=)&#x27;, &#x27;:}&#x27;,
-    &#x27;:^)&#x27;, &#x27;:-D&#x27;, &#x27;:D&#x27;, &#x27;8-D&#x27;, &#x27;8D&#x27;, &#x27;x-D&#x27;, &#x27;xD&#x27;, &#x27;X-D&#x27;, &#x27;XD&#x27;, &#x27;=-D&#x27;, &#x27;=D&#x27;,
-    &#x27;=-3&#x27;, &#x27;=3&#x27;, &#x27;:-))&#x27;, &quot;:&#x27;-)&quot;, &quot;:&#x27;)&quot;, &#x27;:*&#x27;, &#x27;:^*&#x27;, &#x27;&gt;:P&#x27;, &#x27;:-P&#x27;, &#x27;:P&#x27;, &#x27;X-P&#x27;,
-    &#x27;x-p&#x27;, &#x27;xp&#x27;, &#x27;XP&#x27;, &#x27;:-p&#x27;, &#x27;:p&#x27;, &#x27;=p&#x27;, &#x27;:-b&#x27;, &#x27;:b&#x27;, &#x27;&gt;:)&#x27;, &#x27;&gt;;)&#x27;, &#x27;&gt;:-)&#x27;,
-    &#x27;&lt;3&#x27;]
-
-negative_lexicons = [&#x27;:L&#x27;, &#x27;:-/&#x27;, &#x27;&gt;:/&#x27;, &#x27;:S&#x27;, &#x27;&gt;:[&#x27;, &#x27;:@&#x27;, &#x27;:-(&#x27;, &#x27;:[&#x27;, &#x27;:-||&#x27;, &#x27;=L&#x27;, &#x27;:&lt;&#x27;,
-    &#x27;:-[&#x27;, &#x27;:-&lt;&#x27;, &#x27;=\\&#x27;, &#x27;=/&#x27;, &#x27;&gt;:(&#x27;, &#x27;:(&#x27;, &#x27;&gt;.&lt;&#x27;, &quot;:&#x27;-(&quot;, &quot;:&#x27;(&quot;, &#x27;:\\&#x27;, &#x27;:-c&#x27;,
-    &#x27;:c&#x27;, &#x27;:{&#x27;, &#x27;&gt;:\\&#x27;, &#x27;;(&#x27;]
-</pre></details><details><summary>Python code</summary><pre>pos_count = sample_df[&#x27;text&#x27;].apply(lambda x: any(lex in x for lex in positive_lexicons)).sum()
-neg_count = sample_df[&#x27;text&#x27;].apply(lambda x: any(lex in x for lex in negative_lexicons)).sum()
-
-print(&quot;Tweets with positive lexicons:&quot;, pos_count)
-print(&quot;Tweets with negative lexicons:&quot;, neg_count)</pre></details><pre class="output">Tweets with positive lexicons: 482
-Tweets with negative lexicons: 14
-</pre><p>The original run found 482 tweets with positive emoticons and 14 with negative emoticons. These counts may overlap; 496 is not a confirmed count of unique covered tweets. Coverage and accuracy are different measures.</p><details><summary>Python code</summary><pre>pos_mask = sample_df[&#x27;text&#x27;].apply(lambda text: any(term in text for term in positive_lexicons))
-neg_mask = sample_df[&#x27;text&#x27;].apply(lambda text: any(term in text for term in negative_lexicons))
-print(&quot;Unique tweets matched:&quot;, int((pos_mask | neg_mask).sum()))
-print(&quot;Both categories:&quot;, int((pos_mask &amp; neg_mask).sum()))
-</pre></details><h2>Logistic regression comparison</h2><p>Fit a second supervised classifier on the same bag-of-words representation. A fair predictive comparison would require a held-out labeled set.</p><details><summary>Python code</summary><pre>from sklearn.linear_model import LogisticRegression
-
-lr_model = LogisticRegression(max_iter=1000)
-lr_model.fit(X_v, y)
-
-lr_probs = lr_model.predict_proba(X_sample_v)
-sample_df[&#x27;LRPosScore&#x27;] = lr_probs[:, 1]
-
-</pre></details><h2>Sensitivity to positive-token injection</h2><p>Compare a negative sentence with a modified version that adds positive tokens. This is an illustrative sensitivity check, not a comprehensive robustness benchmark.</p><details><summary>Python code</summary><pre>sentence = &quot;The Thai food in this town tastes terrible.&quot;
-
-print(&quot;SIA:&quot;, sia.polarity_scores(sentence))
-print(&quot;TextBlob:&quot;, TextBlob(sentence).sentiment.polarity)
-print(&quot;Naive Bayes:&quot;, model_nb.predict_proba(vectorizer.transform([sentence]))[0][1])</pre></details><pre class="output">SIA: {&#x27;neg&#x27;: 0.307, &#x27;neu&#x27;: 0.693, &#x27;pos&#x27;: 0.0, &#x27;compound&#x27;: -0.4767}
-TextBlob: -1.0
-Naive Bayes: 0.22200168062658243
-</pre><details><summary>Python code</summary><pre>new_sentence = &quot;love good great The Thai food in this town tastes terrible :)&quot;
-
-print(&quot;New sentence:&quot;, new_sentence)
-print(&quot;SIA:&quot;, sia.polarity_scores(new_sentence))
-print(&quot;TextBlob:&quot;, TextBlob(new_sentence).sentiment.polarity)
-print(&quot;Naive Bayes:&quot;, model_nb.predict_proba(vectorizer.transform([new_sentence]))[0][1])</pre></details><pre class="output">New sentence: love good great The Thai food in this town tastes terrible :)
-SIA: {&#x27;neg&#x27;: 0.128, &#x27;neu&#x27;: 0.288, &#x27;pos&#x27;: 0.584, &#x27;compound&#x27;: 0.9022}
-TextBlob: 0.3
-Naive Bayes: 0.9043949417063925
-</pre><h2>Findings and limitations</h2><p>- The baseline sentence scored −0.4767 in VADER, −1.0 in TextBlob, and approximately 0.222 positive probability in Naive Bayes.
-- Adding positive words and an emoticon shifted the respective outputs to 0.9022, 0.3, and approximately 0.904. Sentiment estimates can be strongly affected by surface wording.
-- Emoticon matching has limited coverage, while full-text methods score every document; neither observation proves correctness.
-- No held-out accuracy, calibration, or patient-domain performance was measured. Duplicate posts may influence aggregate patterns.</p><h2>Next steps</h2><p>Create a labeled evaluation set, control duplicate leakage across splits, report precision/recall/F1, and evaluate negation, sarcasm, and mixed sentiment. Validate separately on appropriately governed patient-feedback data before operational use.</p></main></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sentiment Analysis Comparison for Decision Support | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.7 system-ui}main{max-width:900px;margin:auto;padding:40px 24px}h1{font-family:Georgia,serif;font-size:2.4rem}h2{margin-top:40px;border-bottom:2px solid #e8c97a}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:18px;background:#e8eaed;border-radius:8px;font-size:13px}.output{background:#fff;border-left:4px solid #c9a84c}details{margin:16px 0}summary{cursor:pointer;color:#1a3560}p{overflow-wrap:anywhere}</style><style>img{max-width:100%;height:auto}table{border-collapse:collapse;width:100%;margin:20px 0}th,td{padding:8px;border-bottom:1px solid #ccd3dc;text-align:left}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;background:#fff}a{color:#1a3560}figure{margin:24px 0}</style></head><body><main><a href="https://cameron-batts.github.io/">← Portfolio</a><h1>Sentiment Analysis Comparison for Decision Support</h1>
+<p><strong>Author:</strong> Cameron Batts<br />
+<strong>Tools:</strong> Python · pandas · scikit-learn · NLTK · TextBlob</p>
+<h2>Validation update - October 22, 2026</h2>
+<p>The full 14-cell workflow reproduced 20,000 sample tweets, mean length 121.5088 characters and 20,770 vocabulary terms. Emoticon matching found 482 positive and 14 negative matches: 496 unique tweets and 0 in both categories. The controlled sentence change moved Naive Bayes positive probability from 0.2220 to 0.9044. No labeled holdout or healthcare outcome evaluation was performed.</p>
+<p><a href="https://github.com/Cameron-Batts/Sentiment-Analysis-Comparison/blob/main/reports/validation_results.json">Aggregate validation record</a>. <a href="https://github.com/Cameron-Batts/Sentiment-Analysis-Comparison/blob/main/validation/rerun_analysis.py">Repeatable validation script</a>. Run <code>python validation/rerun_analysis.py</code> from the project root. Install <code>requirements-validation.txt</code> first; source CSVs stay local.</p>
+<h2>Business Problem</h2>
+<p>Text feedback can reveal service concerns that numerical ratings miss. This project compares sentiment methods on public tweets and considers their potential application to radiology patient feedback. No patient data or deployed business outcomes are represented.</p>
+<h2>Project Approach</h2>
+<ul>
+<li>Profile 20,000 public tweets from NLTK's Twitter samples.</li>
+<li>Train bag-of-words Naive Bayes and logistic regression on separate positive/negative tweet corpora.</li>
+<li>Compare model behavior with VADER, TextBlob, and emoticon matching.</li>
+<li>Examine sensitivity to added positive words.</li>
+</ul>
+<h2>Historical findings and original context</h2>
+<p>The supplied run reported a mean text length of <strong>121.51 characters</strong> and a classifier vocabulary of <strong>20,770 terms</strong>. Emoticon matching found <strong>482 positive matches</strong> and <strong>14 negative matches</strong>, with overlap not measured in the original run.</p>
+<p>Adding positive tokens to a negative sentence moved Naive Bayes positive probability from <strong>0.222 to 0.904</strong>, TextBlob polarity from <strong>−1.0 to 0.3</strong>, and VADER compound score from <strong>−0.4767 to 0.9022</strong>.</p>
+<p>These are descriptive and illustrative results. No labeled holdout evaluation was performed; no accuracy ranking or healthcare improvement is claimed.</p>
+<h2>Run</h2>
+<pre><code class="language-bash">python -m pip install -r requirements.txt
+jupyter lab notebooks/sentiment_analysis_comparison.ipynb
+</code></pre>
+<p>Run cells from top to bottom. The first run downloads <code>twitter_samples</code> and <code>vader_lexicon</code> from NLTK and requires internet access. Dependencies are unpinned; this workflow has now been re-executed. Selected original aggregate outputs remain in the notebook.</p>
+<h2>Repository Structure</h2>
+<pre><code class="language-text">notebooks/sentiment_analysis_comparison.ipynb
+reports/sentiment_analysis_comparison.html
+requirements.txt
+portfolio_card.html
+README.md
+</code></pre>
+<h2>Data and Limitations</h2>
+<p>Source: NLTK <code>twitter_samples</code>, https://www.nltk.org/nltk_data/. Raw tweets are not bundled. Observe applicable corpus terms and attribution. Rerunning can display public third-party names and handles from the source data. The notebook removes saved tweet excerpts and local machine paths.</p>
+<p>Classifier probabilities and lexicon polarity scores use different scales. Sarcasm, negation, mixed sentiment, domain shift, duplicate posts, and substring matching limit interpretation. Validate on labeled data before operational use.</p>
+<h2>Author</h2>
+<p>Cameron Batts<br />
+GitHub: https://github.com/Cameron-Batts<br />
+Portfolio: https://cameron-batts.github.io</p>
+</main></body></html>

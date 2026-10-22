@@ -465,11 +465,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Applied Benford's Law in R using the benford.analysis package to analyze the leading digit distribution of total vote counts across all regions. Cleaned and tidied the raw election CSV, then ran a chi-squared goodness-of-fit test to quantify deviation from expected distributions.</div>
+<div class="card-body">Executed the R first-digit analysis of 30 provincial totals, retaining the sparse-count caveat and adding a fixed-null simulation with 100,000 replicates.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Reproduced approximate χ² p=0.4741 from 30 provincial totals, with seven expected digit counts below five. This small-sample diagnostic neither establishes conformity nor provides a verdict about election integrity.</div>
+<div class="card-body">The R rerun produced a simulated p-value of 0.4643 from 30 provincial totals. This small first-digit diagnostic does not prove fraud or absence of fraud.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="benford_iran_election.html" target="_blank" rel="noopener">View Analysis</a>
@@ -486,11 +486,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Reviewed pre/post-2009 price data and regression diagnostics, separating observed targets from an optional model-based price-replacement scenario. Revised R source is documented but has not been executed in this update.</div>
+<div class="card-body">Executed the before/after regression and hypothetical 30-price replacement scenario. Preserved the formulas and assumptions while fixing diagnostic plotting and facet-axis layouts.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Verified 30 later records with the repeated price $142,769.70 across ten neighborhoods. These anomalies warrant review; they do not establish fraud, verified replacement values or improved held-out prediction.</div>
+<div class="card-body">The hypothetical price-replacement scenario increased fitting-data R² from 0.8691 to 0.9213. That is not evidence of fraud or improved held-out prediction. The R workflow and diagnostic plots now execute.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="housing_outlier_regression.html" target="_blank" rel="noopener">View Analysis</a>
@@ -507,11 +507,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Revised the R workflow to split before preprocessing, resample training rows only and explicitly fit a classifier. The workflow includes an illustrative loss matrix and fixed-cp pruning; it has not been executed in this update.</div>
+<div class="card-body">Executed the revised R workflow with a split before preprocessing, training-only imputation and resampling, an illustrative loss matrix and fixed-cp pruning.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Examined tree structure on data with 11.09% defaults and corrected leakage and model-type issues. The historical analysis reports no held-out metrics, so improved default detection remains unverified.</div>
+<div class="card-body">The revised test run reached 98.60% default recall but only 11.79% precision and 8.02% specificity. The example demonstrates the false-positive tradeoff of resampling and illustrative loss assumptions.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="loan_default_decision_tree.html" target="_blank" rel="noopener">View Analysis</a>
@@ -528,11 +528,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Reviewed archived logistic results and reconstructed missing R source with training-only imputation, equal-row AIC comparisons and explicit default-positive metrics. The reconstructed workflow has not been executed in this update.</div>
+<div class="card-body">Executed the reconstructed logistic workflow with training-only imputation, equal-row AIC comparisons and three prespecified test thresholds.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">The archived main threshold achieved 82.32% accuracy but only 20.90% default recall, with 1,137 test rows missing predictions. Corrected reporting makes coverage and threshold tradeoffs explicit.</div>
+<div class="card-body">The revised workflow predicts every test row and compares models on identical training observations. At threshold 0.2, default recall was 12.47% with 94.76% specificity; threshold 0.5 missed all defaults.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="loan_default_logistic.html" target="_blank" rel="noopener">View Analysis</a>
@@ -549,11 +549,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Reviewed 336,776 flights, checked airport-hour join coverage and documented 1,556 flights without matched weather. Weather scatterplots cover only observed departure delays over 100 minutes.</div>
+<div class="card-body">Executed the R weather join and missingness checks, then reproduced the matched-flight summaries and restricted weather plots for delays over 100 minutes.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Among weather-matched flights with observed delays, the mean departure delay was 12.635 minutes and median was −2 minutes. Exploratory plots do not establish ranked weather drivers or operational causes.</div>
+<div class="card-body">The R rerun confirmed 335,220 weather-matched flights, 1,556 unmatched flights and mean observed delay of 12.635 minutes. Weather plots restricted to severe delays remain descriptive.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="nyc_flight_delay_analysis.html" target="_blank" rel="noopener">View Analysis</a>
@@ -570,11 +570,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Retained extended historical demonstrations and added a workflow using included FRED snapshots, monthly log growth, training-only model fitting and a fixed 2014–2015 test period for seasonal-naive, ARIMA and VAR forecasts. Revised R code is unexecuted.</div>
+<div class="card-body">Executed the revised offline backtest on monthly log growth, training through 2013 and comparing seasonal naive, ARIMA and VAR on the 2014–2015 window.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Verified 444 consecutive overlapping months from 1987 through 2023. Flagged full-sample seasonal-adjustment leakage in historical comparisons; improved forecasting performance and structural causality remain unverified.</div>
+<div class="card-body">On the revised 24-month historical test window, VAR RMSE was 0.1609 versus 0.3743 for ARIMA and 0.5827 for seasonal naive, in monthly log-growth units. One window does not establish broad forecast superiority.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="housing_price_timeseries.html" target="_blank" rel="noopener">View Analysis</a>
@@ -594,8 +594,8 @@
 <h3>Movie Review Sentiment Classification with BERT</h3>
 <hr class="card-divider"/>
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Classifying short movie reviews requires models that recognize sentiment beyond isolated word counts.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">In a collaborative project, compared unigram/bigram Naive Bayes and logistic regression with fully fine-tuned BERT using predefined Rotten Tomatoes training, validation and test splits.</div></div>
-<div class="card-section"><div class="card-label">Impact</div><div class="card-body">The team analysis reported 84.80% BERT test accuracy versus 77.77% for Naive Bayes and 76.36% for logistic regression across 1,066 balanced test reviews.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Verified Naive Bayes and logistic regression on the predefined splits. Prepared a seeded MPS/CUDA workflow for a new two-epoch BERT run, which remains pending.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Traditional baselines reproduced 77.77% and 76.36% accuracy. The 84.80% BERT result remains historical. A seeded MPS/CUDA workflow is prepared; its new training run is pending.</div></div>
 <div class="project-links"><a class="project-link" href="movie_review_sentiment_bert.html" target="_blank" rel="noopener">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Movie-Review-Sentiment-BERT" target="_blank" rel="noopener">View Code</a></div>
 </div>
 <div class="project-card">
@@ -612,8 +612,8 @@
 <h3>Book Topic Modeling &amp; Financial Entity Extraction</h3>
 <hr class="card-divider"/>
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Large text collections need interpretable themes and reliable entity extraction to support browsing and document review.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Compared five- and ten-topic LDA models on 16,559 book summaries, varied training passes, and inspected spaCy entity extraction across 4,846 financial-news sentences.</div></div>
-<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Identified broad collection themes and demonstrated how preprocessing and token-level counting can distort NER outputs, motivating held-out topic evaluation and complete-span extraction.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Executed POS-aware preprocessing, four LDA configurations and financial NER, including full entity spans from raw text. Kept source text and entity examples local.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Four LDA configurations and raw-text full-span NER were executed. Training-corpus fit and aggregate entity counts are exploratory; no held-out topic or NER accuracy was measured.</div></div>
 <div class="project-links"><a class="project-link" href="book_topics_and_financial_ner.html" target="_blank" rel="noopener">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Book-Topic-Modeling-and-Financial-NER" target="_blank" rel="noopener">View Code</a></div>
 </div>
 <div class="project-card">
@@ -621,8 +621,8 @@
 <h3>Word Embeddings: Domain-Specific vs. Pretrained Models</h3>
 <hr class="card-divider"/>
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Semantic similarity can reflect domain context or shared spelling, making useful text representations difficult to select.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Trained four Word2Vec and FastText models using CBOW and skip-gram on 2,000 movie reviews, then compared selected neighbors with pretrained Google News embeddings.</div></div>
-<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Illustrated domain-specific associations and subword effects, showing why larger cosine scores alone do not establish better semantic relevance. Original results require validation after resolving training warnings.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Trained four Word2Vec/FastText models for ten epochs with the documented preprocessing and settings. Kept optional Google News downloads disabled and recorded aggregate outputs.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Four ten-epoch embedding models completed on 2,000 reviews. Results illustrate architecture and subword effects; multiworker variation remains and no downstream benchmark was added. Optional Google News results remain historical.</div></div>
 <div class="project-links"><a class="project-link" href="word_embedding_comparison.html" target="_blank" rel="noopener">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Word-Embedding-Comparison" target="_blank" rel="noopener">View Code</a></div>
 </div>
 <div class="project-card">
@@ -630,8 +630,8 @@
 <h3>Multi-Class Sentiment Classification</h3>
 <hr class="card-divider"/>
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Short social-media posts contain mixed emotional signals, making negative, neutral, and positive sentiment difficult to distinguish.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Mapped 13 emotions across 40,000 posts into three classes, built a 42,633-feature bag-of-words representation, and compared Naive Bayes, logistic regression, and TextBlob on an 80/20 split.</div></div>
-<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Logistic regression achieved the highest weighted F1 (0.558 versus 0.507 for Naive Bayes and 0.389 for TextBlob), with neutral-class F1 improving from 0.187 to 0.406 over Naive Bayes.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Reran the original 80/20 split and training-only vocabulary. Compared trained classifiers with fixed TextBlob cutoffs and cutoffs selected on separate validation data.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Rerun weighted F1 was 0.5581 for logistic regression, 0.5067 for Naive Bayes and 0.4782 for validation-tuned TextBlob. The results use social-media labels, not patient feedback.</div></div>
 <div class="project-links"><a class="project-link" href="multiclass_sentiment_classification.html" target="_blank" rel="noopener">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Multiclass-Sentiment-Classification" target="_blank" rel="noopener">View Code</a></div>
 </div>
 <div class="project-card">
@@ -639,8 +639,8 @@
 <h3>Sentiment Analysis Comparison for Decision Support</h3>
 <hr class="card-divider"/>
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Text feedback requires interpretable sentiment methods that account for coverage and context limitations.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Compared Naive Bayes, logistic regression, VADER, TextBlob, and emoticon matching using 20,000 public tweets; explored a proposed radiology feedback application.</div></div>
-<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Demonstrated limited emoticon coverage and strong sensitivity to positive-token injection, highlighting the need for labeled evaluation before operational use.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Reran Naive Bayes, logistic regression, VADER, TextBlob and emoticon matching on the NLTK corpora, including a controlled sentence-sensitivity demonstration.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">The full rerun reproduced the 20,770-term vocabulary and found 496 unique emoticon matches with no overlap between categories. Sentence perturbations illustrate score sensitivity; no holdout accuracy or healthcare outcome was evaluated.</div></div>
 <div class="project-links"><a class="project-link" href="sentiment_analysis_comparison.html" target="_blank" rel="noopener">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Sentiment-Analysis-Comparison" target="_blank" rel="noopener">View Code</a></div>
 </div>
 <div class="project-card">
@@ -716,11 +716,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Applied K-Means and hierarchical (agglomerative) clustering in Python, tuning the number of clusters using Calinski-Harabasz, Davies-Bouldin, and Silhouette scores. Examined standardized PCA variance retention alongside clustering on original feature scales.</div>
+<div class="card-body">Reran six cluster-count searches on 200 customers using K-Means and Ward clustering on original feature scales, alongside PCA on standardized features.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">All six internal-metric searches selected six clusters. Two PCA components retained 77.57% of standardized variance. Segment stability and campaign usefulness remain untested.</div>
+<div class="card-body">The full rerun selected six clusters across all six searches. PCA retained 44.27% of variance with one component and 77.57% with two. These are internal diagnostics, not validated marketing segments.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="mall_customer_segmentation.html" target="_blank" rel="noopener">View Analysis</a>
@@ -737,11 +737,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Interpreted archived vehicle-price and bank-marketing model summaries, calculated metrics for an illustrative confusion matrix, and fitted advertising-sales regression on 200 included records. The two archived fitted models are unavailable.</div>
+<div class="card-body">Executed the included advertising regression and checked illustrative confusion-matrix arithmetic. Archived vehicle and bank model summaries remain separate from the reproducible fit.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Advertising regression achieved in-sample R² of 0.9464 and predicted about $71,830 in sales at a $50,000 budget. These associations do not establish causal impact or held-out predictive performance.</div>
+<div class="card-body">The advertising example reproduced fitting-data R² of 0.9464 and a $71,833 illustrative sales prediction. Archived vehicle and bank model files remain unavailable; causal returns were not measured.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="regression_classification_metrics.html" target="_blank" rel="noopener">View Analysis</a>
@@ -924,7 +924,7 @@
 </section>
 <footer>
 <p>Cameron Batts  ·  Data &amp; Analytics Portfolio</p>
-</footer>
+<p><a href="project_validation.html">Project validation summary</a></p></footer>
 <script>
   const tabs = [...document.querySelectorAll('.tab-btn')];
   function activateTab(button, moveFocus = false) {

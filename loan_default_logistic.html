@@ -1,89 +1,67 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Loan Default Logistic Regression and Threshold Tradeoffs | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.65 system-ui}main{max-width:950px;margin:auto;padding:32px 24px}h1{font:bold 2.4rem Georgia}h2{border-bottom:2px solid #e8c97a;margin-top:36px}pre{padding:18px;background:white;border-left:3px solid #c9a84c;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin:16px 0}summary{cursor:pointer}p{overflow-wrap:anywhere}a{color:#1a3560}img{max-width:100%;height:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px;border-bottom:1px solid #ddd}</style><main><a href="https://cameron-batts.github.io/">← Portfolio</a><h1>Loan Default Logistic Regression and Threshold Tradeoffs</h1><p><strong>Cameron Batts</strong></p><h2>Problem</h2><p>Explain the tradeoff between default recall, specificity and accuracy in an imbalanced loan dataset.</p><h2>Approach</h2><p>Reconstruct an R Markdown workflow from the available report concepts, using a stratified split, training-only median imputation, equal-row AIC comparisons and prespecified thresholds. Explicitly treat default (1) as the positive class.</p><h2>Reported results</h2><p>The archived main confusion matrix contains TN=6,848, FP=760, FN=753 and TP=199: accuracy 82.32%, default precision 20.75%, default recall 20.90% and specificity 90.01%. Only 8,560 of 9,697 test rows had predictions; 1,137 were missing. The all-nondefault baseline accuracy on those evaluated rows was 88.88%.</p><h2>Limitations and corrections</h2><p>The PDF used class 0 as positive, so its sensitivity is not default recall. Historical missing-value indicators did not impute the missing values; complete-case omissions reduced coverage. Some AIC comparisons used different row counts and cannot establish the best model. The new workflow changes preprocessing and will not reproduce historical scores. No original source notebook was present; this is a documented reconstruction, not a recovered file.</p><h2>Data</h2><p>The included data have no documented upstream source or redistribution license in the original repository. Preserve provenance when it becomes available.</p><h2>Verification</h2><p>Dataset dimensions, missingness and relevant counts were checked directly. R is unavailable in this environment, so revised R code was reviewed but not parsed, executed or rendered. No new fitted-model performance is claimed.</p><h2>Historical threshold comparison</h2><p>Default (1) is the positive class. Each row evaluates the same 8,560 complete predictions; 1,137 test rows were omitted. Thresholds were explored on the test set, so these comparisons are descriptive.</p><table><tr><th>Threshold scenario</th><th>Accuracy</th><th>Default recall</th><th>Specificity</th></tr><tr><td>Archived main threshold</td><td>82.32%</td><td>20.90%</td><td>90.01%</td></tr><tr><td>Archived higher threshold</td><td>85.53%</td><td>13.13%</td><td>94.58%</td></tr><tr><td>Archived lower threshold</td><td>77.51%</td><td>32.04%</td><td>83.20%</td></tr></table><p><a href="https://github.com/Cameron-Batts/Loan-Default-Logistic/blob/main/Analysis/loan_default_logistic.Rmd">View revised R Markdown source</a></p><details><summary>Revised R Markdown workflow (not executed here)</summary><pre>---
-title: &quot;Loan Default Logistic Regression and Threshold Tradeoffs&quot;
-author: &quot;Cameron Batts&quot;
-output: html_document
----
-
-## Problem
-Explain the tradeoff between default recall, specificity and accuracy in an imbalanced loan dataset.
-
-## Approach
-Reconstruct an R Markdown workflow from the available report concepts, using a stratified split, training-only median imputation, equal-row AIC comparisons and prespecified thresholds. Explicitly treat default (1) as the positive class.
-
-## Reported results
-The archived main confusion matrix contains TN=6,848, FP=760, FN=753 and TP=199: accuracy 82.32%, default precision 20.75%, default recall 20.90% and specificity 90.01%. Only 8,560 of 9,697 test rows had predictions; 1,137 were missing. The all-nondefault baseline accuracy on those evaluated rows was 88.88%.
-
-## Limitations and corrections
-The PDF used class 0 as positive, so its sensitivity is not default recall. Historical missing-value indicators did not impute the missing values; complete-case omissions reduced coverage. Some AIC comparisons used different row counts and cannot establish the best model. The new workflow changes preprocessing and will not reproduce historical scores. No original source notebook was present; this is a documented reconstruction, not a recovered file.
-
-## Verification
-Dataset dimensions, missingness and relevant counts were checked directly. R is unavailable in this environment, so revised R code was reviewed but not parsed, executed or rendered. No new fitted-model performance is claimed.
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-project_root &lt;- if (dir.exists(&quot;Data&quot;)) &quot;.&quot; else &quot;..&quot;
-knitr::opts_knit$set(root.dir = normalizePath(project_root))
-```
-
-```{r preparation}
-loans &lt;- readRDS(&quot;Data/LoanData.rds&quot;)
-stopifnot(all(loans$isLoanDefault %in% c(0, 1)))
-# Fixed data-quality rule; no outcomes are used to choose exclusions.
-loans &lt;- loans[!is.na(loans$incomeAnnual) &amp; loans$incomeAnnual &lt;= 2500000, ]
-loans$isLoanDefault &lt;- factor(loans$isLoanDefault, levels = c(0, 1))
-set.seed(2020)
-# Split within class before learning imputation values or resampling.
-test_rows &lt;- unlist(lapply(split(seq_len(nrow(loans)), loans$isLoanDefault),
-                          function(rows) sample(rows, floor(length(rows) / 3))))
-train &lt;- loans[-test_rows, ]
-test &lt;- loans[test_rows, ]
-stopifnot(length(intersect(rownames(train), rownames(test))) == 0)
-for (v in c(&quot;interestRate&quot;, &quot;employmentYears&quot;)) {
-  fill &lt;- median(train[[v]], na.rm = TRUE)
-  stopifnot(is.finite(fill))
-  train[[paste0(v, &quot;_missing&quot;)]] &lt;- as.integer(is.na(train[[v]]))
-  test[[paste0(v, &quot;_missing&quot;)]] &lt;- as.integer(is.na(test[[v]]))
-  train[[v]][is.na(train[[v]])] &lt;- fill
-  test[[v]][is.na(test[[v]])] &lt;- fill
-}
-stopifnot(!anyNA(train), !anyNA(test))
-metrics &lt;- function(truth, predicted) {
-  cm &lt;- table(actual = factor(truth, levels = c(0, 1)),
-              predicted = factor(predicted, levels = c(0, 1)))
-  tn &lt;- cm[1,1]; fp &lt;- cm[1,2]; fn &lt;- cm[2,1]; tp &lt;- cm[2,2]
-  ratio &lt;- function(a,b) if (b == 0) NA_real_ else a/b
-  print(cm)
-  c(accuracy = (tn+tp)/sum(cm), precision_default = ratio(tp,tp+fp),
-    recall_default = ratio(tp,tp+fn), specificity = ratio(tn,tn+fp),
-    balanced_accuracy = mean(c(ratio(tp,tp+fn),ratio(tn,tn+fp))))
-}
-```
-## Fit logistic models on identical training rows
-This source is a newly reconstructed workflow informed by the archived report, not a recovered original notebook. Training-only median imputation replaces historical complete-case deletion. New outputs will therefore differ from the PDF.
-
-```{r fit-logistic}
-full &lt;- glm(isLoanDefault ~ ., data = train, family = binomial())
-top5 &lt;- glm(isLoanDefault ~ incomeAnnual + creditGrade + interestRate +
-              employmentYears + loanAmount, data = train, family = binomial())
-top3 &lt;- glm(isLoanDefault ~ incomeAnnual + creditGrade + interestRate,
-            data = train, family = binomial())
-stopifnot(nobs(full) == nobs(top5), nobs(top5) == nobs(top3))
-AIC(full, top5, top3)
-summary(full)
-```
-
-## Evaluate prespecified thresholds
-The full model is used for all threshold comparisons. The thresholds are fixed examples, not selected using test labels. A final operational threshold would require separate validation and explicit cost assumptions.
-
-```{r evaluate}
-probability &lt;- predict(full, newdata = test, type = &quot;response&quot;)
-stopifnot(all(is.finite(probability)))
-for (threshold in c(0.1, 0.2, 0.5)) {
-  cat(&quot;\nThreshold:&quot;, threshold, &quot;\n&quot;)
-  print(metrics(test$isLoanDefault, as.integer(probability &gt;= threshold)))
-}
-metrics(test$isLoanDefault, rep(&quot;0&quot;, nrow(test)))
-mean((probability - as.integer(test$isLoanDefault == &quot;1&quot;))^2)
-```
-All default-recall calculations use class 1 as positive. Odds ratios describe conditional associations rather than causal effects or direct changes in probability. AIC comparison is meaningful here because all three models use identical observations; the original PDF compared some fits with different row counts.
-</pre></details><h2>Historical visualizations</h2><p>Images below are retained from the original analysis and do not represent execution of the revised workflow. Historical labels may use stronger claims than the corrected interpretation above supports.</p><figure><img alt="Historical Grid visualization" src="https://raw.githubusercontent.com/Cameron-Batts/Loan-Default-Logistic/main/Images/Grid.png"><figcaption>Grid — historical output</figcaption></figure></main></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Loan Default Logistic Regression and Threshold Tradeoffs | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.65 system-ui}main{max-width:950px;margin:auto;padding:32px 24px}h1{font:bold 2.4rem Georgia}h2{border-bottom:2px solid #e8c97a;margin-top:36px}pre{padding:18px;background:white;border-left:3px solid #c9a84c;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin:16px 0}summary{cursor:pointer}p{overflow-wrap:anywhere}a{color:#1a3560}img{max-width:100%;height:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px;border-bottom:1px solid #ddd}</style><style>img{max-width:100%;height:auto}table{border-collapse:collapse;width:100%;margin:20px 0}th,td{padding:8px;border-bottom:1px solid #ccd3dc;text-align:left}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;background:#fff}a{color:#1a3560}figure{margin:24px 0}</style></head><body><main><a href="https://cameron-batts.github.io/">← Portfolio</a><h1>Loan Default Logistic Regression and Threshold Tradeoffs</h1>
+<p><strong>Author:</strong> Cameron Batts</p>
+<h2>Validation update - October 22, 2026</h2>
+<p>The reconstructed workflow executed and rendered with 19,395 training and 9,696 test rows. All AIC comparisons used the same training rows, and every test row received a prediction.</p>
+<table>
+<thead>
+<tr>
+<th>Fixed threshold</th>
+<th style="text-align:right">Accuracy</th>
+<th style="text-align:right">Default precision</th>
+<th style="text-align:right">Default recall</th>
+<th style="text-align:right">Specificity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.1</td>
+<td style="text-align:right">0.5105</td>
+<td style="text-align:right">0.1523</td>
+<td style="text-align:right">0.7479</td>
+<td style="text-align:right">0.4809</td>
+</tr>
+<tr>
+<td>0.2</td>
+<td style="text-align:right">0.8563</td>
+<td style="text-align:right">0.2287</td>
+<td style="text-align:right">0.1247</td>
+<td style="text-align:right">0.9476</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td style="text-align:right">0.8890</td>
+<td style="text-align:right">0.0000</td>
+<td style="text-align:right">0.0000</td>
+<td style="text-align:right">0.9999</td>
+</tr>
+</tbody>
+</table>
+<p>At 0.5, default recall was zero despite high accuracy. The all-nondefault baseline accuracy was 0.8891; Brier score was 0.0955. Thresholds were prespecified, not tuned on test labels. New preprocessing differs from the archived report, so the new metrics are a separate validation analysis.</p>
+<p><a href="https://github.com/Cameron-Batts/Loan-Default-Logistic/blob/main/Reports/validation_results.json">Aggregate validation record</a>. <a href="https://github.com/Cameron-Batts/Loan-Default-Logistic/blob/main/Reports/executed_workflow.html">Executed R workflow</a> · <a href="https://github.com/Cameron-Batts/Loan-Default-Logistic/blob/main/Reports/validated_session.txt">Recorded R environment</a>.</p>
+<p>Run <code>Rscript validation/rerun_analysis.R</code> from the project root.</p>
+<h2>Problem</h2>
+<p>Explain the tradeoff between default recall, specificity and accuracy in an imbalanced loan dataset.</p>
+<h2>Approach</h2>
+<p>Reconstruct an R Markdown workflow from the available report concepts, using a stratified split, training-only median imputation, equal-row AIC comparisons and prespecified thresholds. Explicitly treat default (1) as the positive class.</p>
+<h2>Reported results</h2>
+<p>The archived main confusion matrix contains TN=6,848, FP=760, FN=753 and TP=199: accuracy 82.32%, default precision 20.75%, default recall 20.90% and specificity 90.01%. Only 8,560 of 9,697 test rows had predictions; 1,137 were missing. The all-nondefault baseline accuracy on those evaluated rows was 88.88%.</p>
+<h2>Limitations and corrections</h2>
+<p>The PDF used class 0 as positive, so its sensitivity is not default recall. Historical missing-value indicators did not impute the missing values; complete-case omissions reduced coverage. Some AIC comparisons used different row counts and cannot establish the best model. The new workflow changes preprocessing and will not reproduce historical scores. No original source notebook was present; this is a documented reconstruction, not a recovered file.</p>
+<h2>Verification</h2>
+<p>Dataset dimensions, missingness and relevant counts were checked directly. The revised R workflow was executed and rendered during this pass. Fresh revised-workflow metrics are reported separately from the archive; no operational benefit is claimed.</p>
+<h2>Data</h2>
+<p>The included data have no documented upstream source or redistribution license in the original repository. Preserve provenance when it becomes available.</p>
+<h2>Run</h2>
+<p>Install R and Pandoc (or use RStudio), then run from the repository root:</p>
+<pre><code class="language-r">source(&quot;install.R&quot;)
+rmarkdown::render(&quot;Analysis/loan_default_logistic.Rmd&quot;)
+</code></pre>
+<p>R package versions are recorded in Reports/validated_packages.csv and Reports/validated_session.txt.</p>
+<h2>Files</h2>
+<ul>
+<li><a href="https://github.com/Cameron-Batts/Loan-Default-Logistic/blob/main/Analysis/loan_default_logistic.Rmd">R Markdown analysis</a></li>
+<li><a href="https://github.com/Cameron-Batts/Loan-Default-Logistic/blob/main/Reports/loan_default_logistic.html">Readable report</a></li>
+<li><a href="https://github.com/Cameron-Batts/Loan-Default-Logistic/blob/main/Reports/Loan%20Default%20Prediction%20via%20Logistic%20Regression.pdf">Original PDF</a> — historical export; conclusions may predate the corrections above.</li>
+<li><a href="https://cameron-batts.github.io/loan_default_logistic.html">Live portfolio report</a></li>
+</ul>
+</main></body></html>
