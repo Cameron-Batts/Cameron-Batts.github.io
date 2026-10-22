@@ -412,19 +412,27 @@
 <section class="section" id="featured" style="border-top: 1px solid var(--gray-100);">
 <h2 class="section-title">Featured Projects</h2><div class="projects-grid"><div class="project-card"><span class="tag">Power BI • Healthcare Operations</span><img alt="Power BI healthcare operations dashboard preview" class="card-img" src="powerbi_dashboard.png"/><h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3><p><strong>Problem:</strong> Operational and workforce data was spread across separate sources, making it difficult to quickly understand status, coverage, and trends.<br/><strong>Approach:</strong> Structured the data into a dashboard concept focused on visibility, headcount, readiness indicators, and leadership decision support.<br/><strong>Tools:</strong> Power BI, Excel<br/><strong>Outcome:</strong> Created a clear reporting view that supports faster review, better visibility, and more informed operational decisions.</p><div class="project-links"><a class="project-link" href="FlightDashboard.pdf">View Dashboard</a></div></div><div class="project-card"><span class="tag">Python • Business Analytics</span><h3>Retail Sales Analysis</h3><p><strong>Problem:</strong> Department-level retail records needed consistent store-week summaries for comparison across store types.<br/><strong>Approach:</strong> Validated the store join, excluded holiday weeks and aggregated department sales into store-week totals.<br/><strong>Tools:</strong> Python, pandas<br/><strong>Outcome:</strong> Recomputed average nonholiday store-week sales of $1.370M, $816,922 and $472,742 for Types A, B and C; these are descriptive differences.</p><div class="project-links"><a class="project-link" href="retail_sales_analysis.html">View Analysis</a></div></div><div class="project-card"><span class="tag">Python • Machine Learning</span><h3>Bank Marketing Prediction</h3><p><strong>Problem:</strong> Marketing campaign data needed to be analyzed to better understand which customers were more likely to respond.<br/><strong>Approach:</strong> Prepared the dataset, evaluated predictors, and applied machine learning methods to identify customer response patterns.<br/><strong>Tools:</strong> Python, pandas, scikit-learn<br/><strong>Outcome:</strong> Identified key predictors and created a structured view of customer behavior for decision support.</p><div class="project-links"><a class="project-link" href="bank_marketing_prediction.html">View Analysis</a></div></div>
     <div class="project-card">
-      <img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
-      <span class="tag">SAS Viya • Industry Trends</span>
-      <h3>U.S. Aviation Industry Trends Analysis</h3>
-      <p><strong>Problem:</strong> Aviation stakeholders needed a unified view of how passenger volume, workforce, and financials shifted across 2017-2021, including the COVID-19 disruption.<br/><strong>Approach:</strong> Built a multi-page SAS Viya report covering passenger trends, forecasting, FTE tracking, quarterly P&amp;L, and revenue/expense change analysis.<br/><strong>Tools:</strong> SAS Viya, SAS Visual Analytics<br/><strong>Outcome:</strong> Surfaced the 2020 collapse and recovery trajectory, enabling side-by-side comparison of revenue vs. expense changes across all route categories.</p>
-      <div class="project-links"><a class="project-link" href="U_S__Aviation_Industry_Trends_using_SAS_Visual_Analytics_on_May_18__2026.pdf" target="_blank">View Report</a></div>
-    </div>
+<img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
+<span class="tag">SAS Viya • Industry Trends</span>
+<h3>U.S. Aviation Industry Trends Analysis</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Examine the 2020 disruption in passenger traffic, employment and quarterly airline finances.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the SAS PDF and independently parse all five included CSV tables. Calculate matched-month passenger changes, the latest observed workforce change and Q3 2019-to-Q3 2020 revenue changes. Treat SAS dots as missing values.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Quantifies the disruption from included data while separating observations, missing values and unvalidated forecasts.</div></div>
+<div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" target="_blank">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" target="_blank">View Code</a></div>
+</div>
     <div class="project-card">
-      <img alt="SAS Megacorp Acquisition Analysis" class="card-img" src="megacorp_exploration_dashboard.png"/>
-      <span class="tag">SAS Viya • Acquisition Analytics</span>
-      <h3>Megacorp Acquisition Analysis</h3>
-      <p><strong>Problem:</strong> Decision makers needed visibility into product reliability, facility footprint, and profitability trends to support a data-driven acquisition assessment.<br/><strong>Approach:</strong> Built a SAS Viya report covering correlation analysis, a facility geography map across 12 U.S. locations, and profit breakdowns by product line from 2015-2018.<br/><strong>Tools:</strong> SAS Viya, SAS Visual Analytics<br/><strong>Outcome:</strong> Revealed $51M in 2018 profit, identified losing product lines, and surfaced a declining profit trend to inform acquisition risk decisions.</p>
-      <div class="project-links"><a class="project-link" href="Megacorp_Acquisition_Analysis_Report.pdf" target="_blank">View Report</a></div>
-    </div>
+<img alt="SAS Megacorp Acquisition Analysis" class="card-img" src="megacorp_exploration_dashboard.png"/>
+<span class="tag">SAS Viya • Acquisition Analytics</span>
+<h3>Megacorp Acquisition Analysis</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational reliability, facility geography and product-line profit in a fictional acquisition scenario.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review Exploration, Geography and Profit Analysis pages, including the PDF appendix that records object-specific year filters. Separate the headline KPI from the year-filtered product and trend objects.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Highlights loss-making product lines and the need to reconcile KPI filter scopes before interpreting acquisition risk.</div></div>
+<div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" target="_blank">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" target="_blank">View Code</a></div>
+</div>
     </div>
 </section>
 <!-- WORK TABS -->
@@ -814,31 +822,27 @@
 </div><div class="tab-panel" id="sas">
 <div class="projects-grid">
           <div class="project-card">
-            <img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
-            <span class="tag">SAS Viya  ·  Visual Analytics  ·  Industry Trends</span>
-            <h3>U.S. Aviation Industry Trends Analysis</h3>
-            <hr class="card-divider"/>
-            <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Aviation industry stakeholders needed a unified view of how passenger volume, workforce levels, financial performance, and operating costs shifted across the 2017-2021 period, including the sharp disruption caused by COVID-19 in 2020.</div></div>
-            <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Built a multi-page SAS Viya report covering domestic and international passenger trends, time series forecasting with confidence intervals, FTE workforce tracking by airline and carrier group, quarterly profit/loss breakdowns, and a year-over-year revenue and expense change analysis across all route types.</div></div>
-            <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Surfaced the scale of the 2020 collapse in both domestic and international travel, revealed recovery trajectories through 2021, and enabled side-by-side comparison of operating revenue versus expense changes across all route categories to support strategic planning decisions.</div></div>
-            <div class="project-links">
-              <a class="project-link" href="U_S__Aviation_Industry_Trends_using_SAS_Visual_Analytics_on_May_18__2026.pdf" target="_blank">View Report</a>
-              <a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" target="_blank">View Code</a>
-            </div>
-          </div>
+<img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
+<span class="tag">SAS Viya  ·  Visual Analytics  ·  Industry Trends</span>
+<h3>U.S. Aviation Industry Trends Analysis</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Examine the 2020 disruption in passenger traffic, employment and quarterly airline finances.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the SAS PDF and independently parse all five included CSV tables. Calculate matched-month passenger changes, the latest observed workforce change and Q3 2019-to-Q3 2020 revenue changes. Treat SAS dots as missing values.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Quantifies the disruption from included data while separating observations, missing values and unvalidated forecasts.</div></div>
+<div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" target="_blank">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" target="_blank">View Code</a></div>
+</div>
           <div class="project-card">
-            <img alt="SAS Megacorp Acquisition Analysis" class="card-img" src="megacorp_exploration_dashboard.png"/>
-            <span class="tag">SAS Viya  ·  Visual Analytics  ·  Acquisition Analytics</span>
-            <h3>Megacorp Acquisition Analysis</h3>
-            <hr class="card-divider"/>
-            <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Decision makers evaluating a potential acquisition needed a clear picture of target company product reliability, facility footprint across U.S. regions, and profitability trends by product line to support a data-driven acquisition assessment.</div></div>
-            <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Built a SAS Viya report across three analytical sections: an exploration page with correlation matrices and unit reliability comparisons by product brand, a geography page mapping 12 facilities across North, South, East, and West regions, and a profit analysis page with year-selectable KPIs, product line profit breakdowns, and a 2015-2018 profit trend line.</div></div>
-            <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Revealed $51M in total 2018 profit with Games and Promotional lines driving positive returns while Action Figure and Stuffed Animal lines carried losses, and surfaced a declining profit trend from $4.9M in 2015 to $972K in 2018, giving leadership the financial visibility needed to evaluate acquisition risk and product line strategy.</div></div>
-            <div class="project-links">
-              <a class="project-link" href="Megacorp_Acquisition_Analysis_Report.pdf" target="_blank">View Report</a>
-              <a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" target="_blank">View Code</a>
-            </div>
-          </div>
+<img alt="SAS Megacorp Acquisition Analysis" class="card-img" src="megacorp_exploration_dashboard.png"/>
+<span class="tag">SAS Viya  ·  Visual Analytics  ·  Acquisition Analytics</span>
+<h3>Megacorp Acquisition Analysis</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational reliability, facility geography and product-line profit in a fictional acquisition scenario.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review Exploration, Geography and Profit Analysis pages, including the PDF appendix that records object-specific year filters. Separate the headline KPI from the year-filtered product and trend objects.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Highlights loss-making product lines and the need to reconcile KPI filter scopes before interpreting acquisition risk.</div></div>
+<div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" target="_blank">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" target="_blank">View Code</a></div>
+</div>
 <div class="project-card">
 <img alt="SAS Insight Toys Report" class="card-img" src="sas_insight_toys.png"/>
 <span class="tag">SAS Viya  ·  Visual Analytics  ·  Operations</span>
@@ -890,44 +894,22 @@
 <span class="tag">SAS Viya  ·  Visual Analytics  ·  Customer Analytics</span>
 <h3>European Customer &amp; Retail Sales Analysis</h3>
 <hr class="card-divider"/>
-<div class="card-section">
-<div class="card-label">Problem</div>
-<div class="card-body">Retail leadership needed visibility into customer distribution and order volume across European markets to understand geographic concentration and total retail sales performance.</div>
-</div>
-<div class="card-section">
-<div class="card-label">Approach</div>
-<div class="card-body">Built a SAS Viya report featuring an interactive geographic bubble map of customer counts by country filtered to Europe, paired with KPI tiles displaying total customers and aggregate retail sales.</div>
-</div>
-<div class="card-section">
-<div class="card-label">Impact</div>
-<div class="card-body">Surfaced 8,300 customers across European markets generating 396K in retail sales, enabling leadership to identify geographic concentration and prioritize market development efforts.</div>
-</div>
-<div class="project-links">
-<a class="project-link" href="Report_Links_on_Apr_25__2026.pdf" target="_blank">View Report</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Customer-Retail-Analysis" target="_blank">View Code</a>
-</div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore customer distribution and retail activity in a Europe-filtered SAS dashboard.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the customer bubble map, retail KPI and PDF filter appendix. The appendix explicitly applies Continent Name = Europe to the customer map and order object.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Presents a geographic customer view and identifies the KPI definitions needed before operational use.</div></div>
+<div class="project-links"><a class="project-link" href="sas_customer_retail.html" target="_blank">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Customer-Retail-Analysis" target="_blank">View Code</a></div>
 </div>
 <div class="project-card">
 <img alt="SAS Facility Products Report" class="card-img" src="sas_facility_products.png"/>
 <span class="tag">SAS Viya  ·  Visual Analytics  ·  Supply Chain</span>
 <h3>Sports Supplier &amp; Facility Products Analysis</h3>
 <hr class="card-divider"/>
-<div class="card-section">
-<div class="card-label">Problem</div>
-<div class="card-body">Supply chain and product managers needed a unified view of supplier networks, product line distribution, and quantity across global facilities in Australia/Pacific, Europe, and North America.</div>
-</div>
-<div class="card-section">
-<div class="card-label">Approach</div>
-<div class="card-body">Built a SAS Viya report mapping 33 suppliers across three global regions, with product category breakdowns by quantity and product line, and a product group table surfacing item counts across Children, Clothes &amp; Shoes, Outdoors, and Sports lines.</div>
-</div>
-<div class="card-section">
-<div class="card-label">Impact</div>
-<div class="card-body">Surfaced 248K units in quantity across product categories, identified Assorted Sports Articles and Children Sports as the highest volume categories, and enabled supply chain managers to visualize supplier concentration by region for sourcing decisions.</div>
-</div>
-<div class="project-links">
-<a class="project-link" href="Family_Products_on_Apr_25__2026.pdf" target="_blank">View Report</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Facility-Products" target="_blank">View Code</a>
-</div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Compare supplier quantities and product assortment across regional dashboard controls.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the supplier treemap, product-category quantity bars and product-group count table. Region buttons show Australia/Pacific, Europe and North America.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">Separates supplier quantity comparisons from assortment counts and makes the export readable without implying verified inventory totals.</div></div>
+<div class="project-links"><a class="project-link" href="sas_facility_products.html" target="_blank">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Facility-Products" target="_blank">View Code</a></div>
 </div>
 </div>
 </div></div><!-- end tabs-wrapper -->
@@ -971,3 +953,4 @@
 </script>
 </body>
 </html>
+
