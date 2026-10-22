@@ -1,0 +1,165 @@
+---
+title: "Mortgage Default Survival Analysis"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Compare Cox proportional hazards specifications and estimate a hypothetical loan survival curve over 120 months.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+load("Data/mortgage_survival.RData")
+# Compare specifications using the same complete monthly observations.
+mortgage_history <- mortgage_history[complete.cases(mortgage_history[, .(start, end, status, CSCORE_B, OLTV, PURPOSE, OCC_STAT)])]
+setorder(mortgage_history, LOAN_ID, start, end)
+stopifnot(all(mortgage_history$end > mortgage_history$start))
+monthly_observations <- nrow(mortgage_history)
+scenario_cscore <- quantile(mortgage_history$CSCORE_B, .75, na.rm = TRUE)
+scenario_oltv <- quantile(mortgage_history$OLTV, .75, na.rm = TRUE)
+scenario_purpose <- names(which.max(table(mortgage_history$PURPOSE)))
+scenario_occupancy <- names(which.max(table(mortgage_history$OCC_STAT)))
+check_ids <- head(unique(mortgage_history$LOAN_ID), 1000)
+check_monthly <- mortgage_history[LOAN_ID %in% check_ids]
+# Keep every predictor change, time gap and event boundary in its own segment.
+# Only adjacent intervals with identical predictors can share a segment.
+mortgage_history[, continuity_block := cumsum(start != shift(end, fill = first(start)))]
+mortgage_history[, event_block := cumsum(shift(status == "default", fill = FALSE))]
+mortgage_history[, segment_id := rleidv(.SD),
+  .SDcols = c("LOAN_ID", "CSCORE_B", "OLTV", "PURPOSE", "OCC_STAT", "continuity_block", "event_block")]
+mortgage_history <- mortgage_history[, c(
+  list(LOAN_ID = first(LOAN_ID), start = first(start), end = last(end), status = last(status)),
+  lapply(.SD, first)
+), by = segment_id, .SDcols = c("CSCORE_B", "OLTV", "PURPOSE", "OCC_STAT")]
+mortgage_history[, segment_id := NULL]
+# Confirm the risk-set equivalence numerically on 1,000 loans.
+check_collapsed <- mortgage_history[LOAN_ID %in% check_ids]
+check_formula <- Surv(start, end, status == "default") ~ CSCORE_B + OLTV + PURPOSE + OCC_STAT
+fit_monthly <- coxph(check_formula, data = check_monthly, ties = "efron")
+fit_collapsed <- coxph(check_formula, data = check_collapsed, ties = "efron")
+stopifnot(isTRUE(all.equal(coef(fit_monthly), coef(fit_collapsed), tolerance = 1e-6)),
+          max(abs(fit_monthly$loglik - fit_collapsed$loglik)) < 1e-6)
+rm(check_monthly, check_collapsed, fit_monthly, fit_collapsed)
+gc()
+c(monthly_intervals = monthly_observations, compact_intervals = nrow(mortgage_history))
+```
+
+```{r}
+uniqueN(mortgage_history$LOAN_ID)
+```
+
+```{r}
+dt <- as.data.table(mortgage_history)
+temp_data <- dt[order(-end), .SD[1], by = LOAN_ID]
+mean(temp_data$status == "default")
+```
+
+```{r}
+Model.CSCORE <- coxph(formula = Surv(start,end,status=="default") ~ 
+                  CSCORE_B,
+                data=mortgage_history,
+                ties="efron")
+```
+
+```{r}
+Model.OLTV <- coxph(formula = Surv(start,end,status=="default") ~ 
+                  OLTV,
+                data=mortgage_history,
+                ties="efron")
+```
+
+```{r}
+Model.PURPOSE <- coxph(formula = Surv(start,end,status=="default") ~ 
+                  PURPOSE,
+                data=mortgage_history,
+                ties="efron")
+```
+
+```{r}
+Model.OCC <- coxph(formula = Surv(start,end,status=="default") ~ 
+                  OCC_STAT,
+                data=mortgage_history,
+                ties="efron")
+```
+
+```{r}
+Model.ALL <- coxph(formula = Surv(start,end,status=="default") ~ 
+                  CSCORE_B + OLTV + PURPOSE + OCC_STAT,
+                data=mortgage_history,
+                ties="efron")
+```
+
+```{r}
+AIC(Model.CSCORE, Model.OLTV, Model.PURPOSE, Model.OCC, Model.ALL)
+```
+
+```{r}
+num_months = 120
+quantile_level = 0.75
+hyp.cscore <- scenario_cscore
+hyp.oltv <- scenario_oltv
+hyp.purpose <- scenario_purpose
+hyp.occ <- scenario_occupancy
+
+
+
+data.hypo.default <- data.table(
+  LOAN_ID  = rep("HYPOTHETICAL", num_months),
+  status   = c(rep("censored", num_months - 1), "default"),
+  start    = 0:(num_months - 1),
+  end      = 1:num_months,
+  CSCORE_B = rep(hyp.cscore, num_months),
+  OLTV = rep(hyp.oltv, num_months), 
+  PURPOSE = rep(hyp.purpose, num_months), 
+  OCC_STAT = rep(hyp.occ, num_months)
+  
+)
+```
+
+```{r}
+data.hypo.default<-data.hypo.default[, h_D :=
+  predict(
+    Model.ALL,
+    newdata = data.hypo.default,
+    type = "expected"
+  )
+]
+
+data.hypo.default<-data.hypo.default[, H_D := cumsum(h_D), by = LOAN_ID]
+
+data.hypo.default<-data.hypo.default[, H_D_lag := shift(
+  H_D,
+  n = 1,
+  type = "lag",
+  fill = 0
+), by = LOAN_ID]
+
+data.hypo.default<-data.hypo.default[, S_D_lag := exp(-H_D_lag)]
+data.hypo.default<-data.hypo.default[, S_D := exp(-H_D)]
+data.hypo.default<-data.hypo.default[, P_D_t:= S_D_lag - S_D]
+```
+
+```{r}
+data.hypo.default[end == 120, S_D]
+```
+
+```{r}
+data.hypo.default[end == 120, P_D_t]
+```
+
+## Interpretation limits
+
+Only adjacent intervals with identical predictors are combined; every time gap, predictor change and event boundary is retained. Scenario quantiles and modes retain the monthly-observation weighting of the historical input. These are in-sample hazard models. Prepayment is treated as censoring; default-only survival is not a competing-risk cumulative incidence estimate. No held-out calibration or proportional-hazards diagnostics are claimed. Raw loan records are excluded from publication.

@@ -1,0 +1,58 @@
+{
+  "VTI": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:10.851683+00:00",
+    "response_sha256": "e06e13d960a5c962a321d81714e8f7edaee102f1058ff317402ae139ee121d92",
+    "cache_sha256": "a38cd6af444b2e1fc1c51aa09170a6b14b08ca53f8e95a9d587beed353539f16",
+    "observations": 1318
+  },
+  "VEA": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:14.054848+00:00",
+    "response_sha256": "b9c9dc393d71119ed0da44b0d53c3feb0065e5f86d4e66e989d6dc10f77066c0",
+    "cache_sha256": "484241dc2992f3a94b690ba307b4332463157451dcdb5f125a673c53cd93320a",
+    "observations": 1318
+  },
+  "VWO": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:17.196564+00:00",
+    "response_sha256": "56406c22e737e96a271cf33f514288479996e5a831df8193f9398c5e9193059a",
+    "cache_sha256": "44f309ce492d3d67f2e91c49497a4346744730a5aefee27991a9fb381555cb98",
+    "observations": 1318
+  },
+  "BND": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:21.521260+00:00",
+    "response_sha256": "500aba213fa08c050b69659e507582304ef7379c28ac844ad22faf639c6d0f63",
+    "cache_sha256": "a549464d3ac7afaf6c64c3fd8897b922a195602db995c4126ffb459fe9be9506",
+    "observations": 1318
+  },
+  "VNQ": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:24.645477+00:00",
+    "response_sha256": "7e2d213383b962514ad054c20cb1a736b331257f313dec74a660dbfab884e600",
+    "cache_sha256": "2824d9b4946f8f0c5f6ac2a9f29833e5fb8ddc4c66ea5fd6ffcc192428dedbd6",
+    "observations": 1318
+  },
+  "GLD": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:27.709538+00:00",
+    "response_sha256": "8fb3289600e0b6e137e97e55f89b5794295c16f9172181504b002d2d2a4d40c0",
+    "cache_sha256": "ad04540c07b54b9862d001e4f54d2d660529c486946a1f3c80afb12c1a94b959",
+    "observations": 1318
+  },
+  "QQQ": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:30.940575+00:00",
+    "response_sha256": "c7213c72c76c85c950bc7e1d1dbc3a580e5fe4bbd23cb878acdc7bdd6f822ef1",
+    "cache_sha256": "6bf39c9c4bfd472d9e13244219d6833076f27d38bee2d214cb0baccad1f13ac6",
+    "observations": 1318
+  },
+  "SPY": {
+    "source": "Yahoo Finance chart endpoint",
+    "retrieved_utc": "2026-10-22T22:34:33.929811+00:00",
+    "response_sha256": "18f1d88bd8d44c6c00592f2254cc8a921cf5e07b8c0d7fe3c97e54f2f1e0fde4",
+    "cache_sha256": "abdc5a6e9066dc6ea2e612408d72824105000805e7b857689abb9b84e67ea341",
+    "observations": 1318
+  }
+}

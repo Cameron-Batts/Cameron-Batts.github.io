@@ -1,0 +1,273 @@
+---
+title: "Portfolio Volatility and Risk Model Comparison"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Compare Gaussian GARCH specifications, one-day VaR exceedances, and approximate capital reserves across forecast horizons.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+# Tickers for the seven ETFs chosen in portfolio specification
+tickers <- c("VTI", "VEA", "VWO", "BND", "VNQ", "GLD", "QQQ")
+
+# Portfolio weight on each ticker, matching the order above
+weights <- c(0.35, 0.15, 0.10, 0.15, 0.10, 0.05, 0.10)
+
+# Confirm weights sum to one
+stopifnot(abs(sum(weights) - 1) < 1e-8)
+
+# Total portfolio market value, used to convert return-based risk measures
+# into dollar terms for the Board's capital reserve
+portf.value <- 500e6
+```
+
+```{r}
+date_start <- "2020-01-01"        # first calendar date of the full sample
+date_end   <- "2025-03-15"        # pulled past 30 trading days into 2025 as a buffer
+ntickers   <- length(tickers)     # number of assets to loop over
+
+for (i in 1:ntickers) {
+  # Load adjusted price history for the requested ticker
+  px  <- read_market_history(tickers[i], 
+                    from = date_start, to = date_end)
+  px  <- Ad(px)                              # keep the adjusted close column only
+  ret <- na.omit(diff(px) / lag(px)) # daily discrete (simple) returns
+  if (i == 1) {
+    data <- ret                              # first ticker seeds the data object
+  } else {
+    data <- merge(data, ret)                 # later tickers are joined on by date
+  }
+}
+names(data)     <- tickers        # label columns with their ticker symbols
+data            <- na.omit(data)  # drop the leading NA row from the return calc
+print(range(index(data)))         # confirms the actual date range pulled
+matret_discrete <- as.matrix(data) # store aligned returns as a plain numeric matrix
+
+# Portfolio discrete return, then convert to log return
+# weighted_returns() does a matrix multiply that strips the xts class off,
+# so we re-attach the date index right away to keep everything downstream
+# (index(), rbind(), ugarchfit()) behaving like a proper time series
+portf.DiscreteRet <- weighted_returns(matret_discrete, weights, discrete = TRUE)
+portf.DiscreteRet <- xts(portf.DiscreteRet, order.by = index(data))
+portf.LogRet       <- log(1 + portf.DiscreteRet)
+
+# Split into training (2020-2024) and test (first 30 trading days of 2025)
+# NOTE: use index(data), not index(portf.LogRet) - weighted_returns() does a
+# matrix multiply that strips the xts date index off the return vectors
+dates        <- index(data)
+train.idx    <- dates <= calendar_date(2024,12,31)
+train.logret <- portf.LogRet[train.idx]
+test.logret  <- head(portf.LogRet[!train.idx], 30)
+
+# Combined series used later for rolling backtesting over the test window
+full.logret <- rbind(train.logret, test.logret)
+
+n.train <- length(train.logret)
+n.test  <- length(test.logret)
+n.train
+n.test
+```
+
+```{r}
+train.vec <- as.numeric(train.logret)
+
+# Histogram of training log returns vs. a fitted Normal density
+normal_fit_plot(train.vec)
+```
+
+```{r}
+# Summary moments of the training log returns
+r.mean <- mean(train.vec)
+r.sd   <- sd(train.vec)
+r.skew <- skewness(train.vec)
+r.kurt <- kurtosis(train.vec)
+
+r.mean
+r.sd
+r.skew
+r.kurt
+```
+
+```{r}
+# ACF of raw returns: checks whether the (absent) mean specification is reasonable
+acf(train.vec, main = "ACF of Daily Log Returns")
+```
+
+```{r}
+# ACF of squared returns: checks for volatility clustering (ARCH effects)
+acf(train.vec^2, main = "ACF of Squared Daily Log Returns")
+```
+
+```{r}
+# Current model: no mean, GARCH(1,1), Gaussian innovations
+spec.current <- ugarchspec(
+  mean.model     = list(armaOrder = c(0,0), include.mean = FALSE),
+  variance.model = list(model = "sGARCH", garchOrder = c(1,1)),
+  distribution.model = "norm"
+)
+
+# Alt 1: vary the mean only (AR(1) with intercept), same GARCH(1,1) Normal volatility
+spec.alt1 <- ugarchspec(
+  mean.model     = list(armaOrder = c(1,0), include.mean = TRUE),
+  variance.model = list(model = "sGARCH", garchOrder = c(1,1)),
+  distribution.model = "norm"
+)
+
+# Alt 2: vary the volatility only (GJR-GARCH for leverage), same no-mean, Normal
+spec.alt2 <- ugarchspec(
+  mean.model     = list(armaOrder = c(0,0), include.mean = FALSE),
+  variance.model = list(model = "gjrGARCH", garchOrder = c(1,1)),
+  distribution.model = "norm"
+)
+```
+
+```{r}
+# Fit each spec on the training sample only
+fit.current <- ugarchfit(spec.current, data = train.logret, solver = "hybrid")
+fit.alt1    <- ugarchfit(spec.alt1,    data = train.logret, solver = "hybrid")
+fit.alt2    <- ugarchfit(spec.alt2,    data = train.logret, solver = "hybrid")
+stopifnot(convergence(fit.current) == 0, convergence(fit.alt1) == 0, convergence(fit.alt2) == 0)
+
+# AIC for each (row "Akaike" of infocriteria)
+AIC.current <- infocriteria(fit.current)["Akaike",]
+AIC.alt1    <- infocriteria(fit.alt1)["Akaike",]
+AIC.alt2    <- infocriteria(fit.alt2)["Akaike",]
+
+AIC.current
+AIC.alt1
+AIC.alt2
+```
+
+```{r}
+# Backtest the 1-day 95% VaR over the test sample with a daily refit,
+# moving window equal in length to the training sample.
+# ugarchroll's as.data.frame() output stores the realized return and the
+# 5% VaR forecast; a violation is a day the realized return fell below VaR
+count_violations <- function(spec) {
+  roll <- ugarchroll(
+    spec, data = full.logret,
+    n.start       = n.train,
+    refit.every   = 1,
+    refit.window  = "moving",
+    calculate.VaR = TRUE,
+    VaR.alpha     = 0.05,
+    solver        = "hybrid"
+  )
+  df <- as.data.frame(roll)
+  # column names from ugarchroll: "Realized" and "alpha(5%)" hold the
+  # realized return and the VaR forecast at the 5% tail
+  sum(df$Realized < df[["alpha(5%)"]])
+}
+viol.current <- count_violations(spec.current)
+viol.alt1    <- count_violations(spec.alt1)
+viol.alt2    <- count_violations(spec.alt2)
+
+viol.current
+viol.alt1
+viol.alt2
+```
+
+```{r}
+# Standardized residuals from the training fit, and the ACF of their squares
+resid.current <- residuals(fit.current, standardize = TRUE)
+resid.alt1    <- residuals(fit.alt1,    standardize = TRUE)
+resid.alt2    <- residuals(fit.alt2,    standardize = TRUE)
+
+acf(as.numeric(resid.current)^2, main = "ACF of Squared Std. Residuals: Current Model")
+acf(as.numeric(resid.alt1)^2,    main = "ACF of Squared Std. Residuals: Alt 1 (Mean)")
+acf(as.numeric(resid.alt2)^2,    main = "ACF of Squared Std. Residuals: Alt 2 (Volatility)")
+```
+
+```{r}
+# Side by side comparison of the three models
+model.compare <- data.table(
+  Model      = c("Current (no mean, sGARCH)", "Alt 1 (AR(1) mean, sGARCH)", "Alt 2 (no mean, gjrGARCH)"),
+  AIC        = c(AIC.current, AIC.alt1, AIC.alt2),
+  Violations = c(viol.current, viol.alt1, viol.alt2)
+)
+model.compare
+```
+
+```{r}
+# Uses ugarchforecast (not simulation) to get the h-day mean and variance
+# using summed forecast variances as an approximation for multi-day risk.
+# This avoids the instability that came from bootstrap-resampling fat-tailed
+# residuals under a highly persistent GARCH process, which was producing
+# NaNs and dollar losses larger than the portfolio itself.
+forecast_cache <- new.env(parent = emptyenv())
+rolling_mean_ES <- function(spec, horizon, confidence) {
+  alpha   <- 1 - confidence
+  z.alpha <- qnorm(alpha)
+
+  starts <- seq(1, n.test, by = horizon)
+  starts <- starts[starts + horizon - 1 <= n.test]  # keep only full windows
+
+  es.vals <- numeric(length(starts))
+  for (j in seq_along(starts)) {
+    end.idx       <- n.train + starts[j] - 1          # last obs in this expanding window
+    logret_window <- full.logret[1:end.idx]
+
+    key <- paste(digest::digest(spec), end.idx, horizon, sep = "-")
+    if (!exists(key, envir = forecast_cache, inherits = FALSE)) {
+      fit <- ugarchfit(spec, data = logret_window, solver = "hybrid")
+      stopifnot(convergence(fit) == 0)
+      fc <- ugarchforecast(fit, n.ahead = horizon)
+      assign(key, c(mu = sum(as.numeric(fitted(fc))),
+                    sd = sqrt(sum(as.numeric(sigma(fc))^2))), envir = forecast_cache)
+    }
+    cached <- get(key, envir = forecast_cache)
+    mu.h <- cached[["mu"]]
+    sd.h <- cached[["sd"]]
+
+    # Closed-form Normal ES: -(mean - sd * dnorm(z_alpha)/alpha), in return terms
+    es.return  <- -(mu.h - sd.h * dnorm(z.alpha) / alpha)
+    es.vals[j] <- portf.value * es.return
+  }
+  mean(es.vals, na.rm = TRUE)
+}
+```
+
+```{r}
+horizons     <- c(1, 5, 10)
+confidences  <- c(0.99, 0.95, 0.90)
+model.specs  <- list(Current = spec.current, `Alt 1` = spec.alt1, `Alt 2` = spec.alt2)
+
+results <- data.table(expand.grid(
+  Horizon    = horizons,
+  Confidence = confidences
+))
+results[, `:=`(Current = NA_real_, `Alt 1` = NA_real_, `Alt 2` = NA_real_)]
+
+for (i in 1:nrow(results)) {
+  h     <- results$Horizon[i]
+  conf  <- results$Confidence[i]
+  for (m in names(model.specs)) {
+    results[i, (m) := rolling_mean_ES(model.specs[[m]], h, conf)]
+  }
+}
+
+# Order rows to match the comparison table layout and add a label column
+results <- results[order(-Confidence, Horizon)]
+results[, Label := paste0(Horizon, "-day @ ", Confidence * 100, "%")]
+setcolorder(results, c("Label", "Current", "Alt 1", "Alt 2"))
+results
+```
+
+## Interpretation limits
+
+Multi-day reserves use an approximation based on summed conditional forecast variances. Future GARCH returns are not jointly Gaussian merely because one-step innovations are Gaussian. AR mean dynamics can also induce cross-period covariance. A short VaR exceedance check does not validate expected shortfall.

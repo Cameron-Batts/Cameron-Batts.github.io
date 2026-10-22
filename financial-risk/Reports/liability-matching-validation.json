@@ -1,0 +1,47 @@
+{
+  "status": "executed",
+  "elapsed_seconds": 0.9796476364136,
+  "metrics": {
+    "pv.liab": 522898.7,
+    "dmod.liab": 1.288009643924,
+    "pcpb": -0.001288009643924,
+    "ladder": [
+      {
+        "maturity": "2025-08-15",
+        "coupon": 0.02,
+        "amount": 100000,
+        "bd_price": 99.3445,
+        "face_value": 94833.81214116992
+      },
+      {
+        "maturity": "2026-02-15",
+        "coupon": 0.01625,
+        "amount": 105000,
+        "bd_price": 98.1125,
+        "face_value": 100782.15026258162
+      },
+      {
+        "maturity": "2026-08-15",
+        "coupon": 0.015,
+        "amount": 110000,
+        "bd_price": 96.9435,
+        "face_value": 106601.0052334651
+      },
+      {
+        "maturity": "2027-02-15",
+        "coupon": 0.0225,
+        "amount": 115000,
+        "bd_price": 97.2285,
+        "face_value": 112400.5127727161
+      },
+      {
+        "maturity": "2027-08-15",
+        "coupon": 0.0225,
+        "amount": 120000,
+        "bd_price": 96.58,
+        "face_value": 118665.01854140915
+      }
+    ]
+  },
+  "source_sha256": "d4e7dccda1759f81fcfdc870f8e890b1909776ac851154d8b42f2fe1f98ffbdb"
+}

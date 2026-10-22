@@ -1,0 +1,14 @@
+{
+  "jrvFinance": {
+    "source": "https://github.com/cran/jrvFinance",
+    "archive_sha256": "e5895348441bdd21f277ce0ed6208628d22e9d4f0ba54e743207a21746562b69"
+  },
+  "spd": {
+    "source": "https://github.com/cran/spd",
+    "archive_sha256": "ae12db4ee5a7a810c0329960cf308c51e76b70b35274e2993f3bfb922d02cad7"
+  },
+  "rugarch": {
+    "source": "https://github.com/alexiosg/rugarch",
+    "archive_sha256": "83762a8987f096e077fff03654f07754680678717e5fc4e7d567e3b9a354b42a"
+  }
+}

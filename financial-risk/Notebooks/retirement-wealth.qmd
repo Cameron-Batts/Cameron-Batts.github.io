@@ -1,0 +1,181 @@
+---
+title: "Retirement Wealth Simulation"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Compare five-year retirement wealth under equity-funded spending and a prefunded STRIPS strategy using matched bootstrap returns.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+load("Data/annual_equity_returns.RData")
+head(lcap_data)
+```
+
+```{r}
+logret <- log(1 + lcap_data$lcap)
+```
+
+```{r}
+mean(logret)
+round(mean(logret), 4)
+```
+
+```{r}
+sd(logret)
+round(sd(logret), 4)
+```
+
+```{r}
+skewness(logret)
+
+round(skewness(logret), 4)
+```
+
+```{r}
+kurtosis(logret)
+round(kurtosis(logret), 4)
+```
+
+```{r}
+jarque.test(as.vector(logret))
+```
+
+```{r}
+n.fit <- fitdistr(logret,"normal")
+mu <- n.fit$estimate[1]
+sig <- n.fit$estimate[2]
+n.fit$loglik
+AIC.n <- 2*length(n.fit$estimate)-2*n.fit$loglik
+round(AIC.n, 4)
+```
+
+```{r}
+t.fit <- fitdistr(logret, "t", method = "L-BFGS-B", lower = c(-Inf, 1e-8, 1e-4))
+m <- t.fit$estimate[1]
+s <- t.fit$estimate[2]
+tdf <- t.fit$estimate[3]
+t.fit$loglik
+AIC.t <- 2*length(t.fit$estimate)-2*t.fit$loglik
+round(AIC.t, 4)
+```
+
+```{r}
+initialwealth = 2000000
+annualexpenses = 100000
+```
+
+```{r}
+set.seed(437)
+nsim <- 10000
+nyr = 5
+```
+
+```{r}
+simmat <- matrix(0, nrow = nsim, ncol = nyr)
+```
+
+```{r}
+for (iyr in 1:nyr) {
+  simmat[, iyr] <- sample(lcap_data$lcap, nsim, replace = TRUE)
+} 
+head(simmat)
+```
+
+```{r}
+wmat1   <- matrix(0, nrow = nsim, ncol = nyr)
+```
+
+```{r}
+initialwealth - annualexpenses
+```
+
+```{r}
+wmat1[,1]   <- (initialwealth - annualexpenses) * (1 + simmat[, 1])
+head(wmat1)
+```
+
+```{r}
+for (iyr in 2:nyr) {
+  wmat1[, iyr] <- (wmat1[, iyr - 1] - annualexpenses) * (1 + simmat[, iyr])
+}
+head(wmat1)
+```
+
+```{r}
+wend.1 <- wmat1[, nyr]
+summary(wend.1)
+```
+
+```{r}
+round(median(wend.1) / 1000000, 1)
+```
+
+```{r}
+lower_tail_summary(wend.1, 0.95)
+```
+
+```{r}
+lower_tail_summary(wend.1, 0.95) / 1000000
+```
+
+```{r}
+ci.cost = 377204
+strips_payouts = 100000
+```
+
+```{r}
+wmat2   <- matrix(0, nrow = nsim, ncol = nyr)
+```
+
+```{r}
+initialwealth - annualexpenses - ci.cost
+```
+
+```{r}
+wmat2[,1]   <- (initialwealth - annualexpenses - ci.cost) * (1 + simmat[, 1])
+head(wmat2)
+```
+
+```{r}
+for (iyr in 2:nyr) {
+  wmat2[, iyr] <- (wmat2[, iyr - 1] + strips_payouts - annualexpenses) * (1 + simmat[, iyr])
+}
+head(wmat2)
+```
+
+```{r}
+wend.2 <- wmat2[, nyr]
+summary(wend.2)
+```
+
+```{r}
+round(median(wend.2) / 1000000, 1)
+```
+
+```{r}
+lower_tail_summary(wend.2, 0.95)
+```
+
+```{r}
+lower_tail_summary(wend.2, 0.95) / 1000000
+signif(lower_tail_summary(wend.2, 0.95)["VaR"]/1e6, 4)
+```
+
+## Interpretation limits
+
+Independent resampling does not preserve volatility clustering. Lower-tail summaries of terminal wealth are wealth thresholds, not loss VaR. Fitted t log-return simulations can produce extreme wealth values; inspect their tails before interpretation.

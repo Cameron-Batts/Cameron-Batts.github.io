@@ -1,0 +1,10 @@
+{
+  "status": "executed",
+  "elapsed_seconds": 0.6676201820374,
+  "metrics": {
+    "strips.clean.price": 57.306325635359,
+    "total.pv": 497222.82499999995,
+    "total.mv": 46240.88709239792
+  },
+  "source_sha256": "8fd401cbba0aaff6a52c9e3da5e3c68d7a868b8db87f9a706d828c4e764ee86f"
+}

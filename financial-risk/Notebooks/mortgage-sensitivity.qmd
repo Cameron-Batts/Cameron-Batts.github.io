@@ -1,0 +1,215 @@
+---
+title: "Mortgage Default and Loan-to-Value Sensitivity"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Join loan origination and performance histories, fit a default hazard model, and compare a higher loan-to-value scenario.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+load("Data/mortgage_credit.RData")
+```
+
+```{r}
+tmp <- Data_A[, .(LOAN_ID, OLTV, DTI, PROP_TYP, CSCORE_B)]
+```
+
+```{r}
+data <- tmp[Data_P,on="LOAN_ID"]
+```
+
+```{r}
+ZBC_default <- c("02","03","09","15")      
+ZBC_prepaid <- c("01")
+
+data <- data[, raw_status := ifelse(
+  Zero.Bal.Code %in% ZBC_default, "default",
+  ifelse(Zero.Bal.Code %in% ZBC_prepaid, "prepaid", "censored")
+)]
+```
+
+```{r}
+data<-data[
+  ,
+  final_row := Loan.Age == max(Loan.Age),
+  by = LOAN_ID
+]
+```
+
+```{r}
+data<-data[
+  ,
+  status := ifelse(
+    raw_status == "default", "default",
+    ifelse(
+      raw_status == "prepaid", "prepaid",
+      ifelse(final_row, "censored", "active")
+    )
+  )
+]
+```
+
+```{r}
+data <- data[, start := Loan.Age]
+data <- data[, end := Loan.Age + 1]
+
+data <- data[order(LOAN_ID, Loan.Age)]
+```
+
+```{r}
+data<-data[, event := ifelse(status == "default", 1, 0)]
+```
+
+```{r}
+data[, .(observations = .N, loans = uniqueN(LOAN_ID))]
+```
+
+```{r}
+ages <- seq(0,240,24)
+
+data<-data[
+  ,
+  age.bucket := cut(
+    Loan.Age,
+    breaks = ages,
+    include.lowest = TRUE
+  )
+]
+```
+
+```{r}
+data<-data[, EAD := LAST_UPB]
+```
+
+```{r}
+data<-data[, LGD := 0.10]
+```
+
+```{r}
+data[, .N, by = status]
+```
+
+```{r}
+summary(data[, .(CSCORE_B, OLTV, DTI)])
+```
+
+```{r}
+DefaultModel <- coxph(
+  Surv(start, end, status == "default") ~ CSCORE_B + OLTV + DTI + PROP_TYP,
+  data = data,
+  ties = "efron"
+)
+
+DefaultModel
+```
+
+```{r}
+sim.creditscore <- data[, round(mean(CSCORE_B, na.rm = TRUE))]
+sim.oltv        <- data[, round(mean(OLTV, na.rm = TRUE))]
+sim.dti         <- data[, round(mean(DTI, na.rm = TRUE))]
+
+
+sim.age <- data[
+  status == "default",
+  round(mean(Loan.Age, na.rm = TRUE))
+]
+
+
+data.hypo.default <- data.table(
+  LOAN_ID = rep("HYPOTHETICAL", sim.age),
+  status  = c(rep("active", sim.age - 1), "default"),
+  start   = 0:(sim.age - 1),
+  end     = 1:sim.age,
+
+  CSCORE_B = rep(sim.creditscore, sim.age),
+  OLTV     = rep(sim.oltv, sim.age),
+  DTI      = rep(sim.dti, sim.age),
+
+
+  PROP_TYP = "SF"
+)
+```
+
+```{r}
+pred <- predict(
+  DefaultModel,
+  newdata = data.hypo.default,
+  type = "expected"
+)
+
+data.hypo.default<-data.hypo.default[,h_D := pred]
+```
+
+```{r}
+data.hypo.default <- data.hypo.default[,H_D := cumsum(h_D), by = LOAN_ID]
+data.hypo.default<-data.hypo.default[, H_D_lag := shift(
+  H_D,
+  n = 1,
+  type = "lag",
+  fill = 0
+), by = LOAN_ID]
+data.hypo.default<-data.hypo.default[, S_D_lag := exp(-H_D_lag)]
+data.hypo.default<-data.hypo.default[, S_D := exp(-H_D)]
+data.hypo.default<-data.hypo.default[, P_D_t := S_D_lag - S_D]
+```
+
+```{r}
+data.hypo.default2 <- copy(data.hypo.default)
+
+data.hypo.default2<-data.hypo.default2[, OLTV := OLTV + 10]
+```
+
+```{r}
+pred2 <- predict(
+  DefaultModel,
+  newdata = data.hypo.default2,
+  type = "expected"
+)
+
+data.hypo.default2<-data.hypo.default2[,h_D := pred2]
+data.hypo.default2 <- data.hypo.default2[,H_D := cumsum(h_D), by = LOAN_ID]
+data.hypo.default2<-data.hypo.default2[, H_D_lag := shift(
+  H_D,
+  n = 1,
+  type = "lag",
+  fill = 0
+), by = LOAN_ID]
+data.hypo.default2<-data.hypo.default2[, S_D_lag := exp(-H_D_lag)]
+data.hypo.default2<-data.hypo.default2[, S_D := exp(-H_D)]
+data.hypo.default2<-data.hypo.default2[, P_D_t := S_D_lag - S_D]
+```
+
+```{r}
+tail(data.hypo.default2$H_D, 1) / tail(data.hypo.default$H_D, 1)
+```
+
+```{r}
+exp(coef(DefaultModel)["OLTV"] * 10)
+```
+
+```{r}
+F1 <- 1 - tail(data.hypo.default$S_D, 1)
+F2 <- 1 - tail(data.hypo.default2$S_D, 1)
+F1
+F2
+F2 - F1
+```
+
+## Interpretation limits
+
+These are in-sample hazard models. Prepayment is treated as censoring; default-only survival is not a competing-risk cumulative incidence estimate. No held-out calibration or proportional-hazards diagnostics are claimed. Raw loan records are excluded from publication.

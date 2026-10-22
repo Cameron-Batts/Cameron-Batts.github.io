@@ -1,0 +1,12 @@
+{
+  "status": "executed",
+  "elapsed_seconds": 1.274886846542,
+  "metrics": {
+    "ES0_loss": 8981689.548698153,
+    "beta_port": 0.7902055691473,
+    "Nc": 234,
+    "ES_hedged": -8306925.631985525,
+    "pct_cut": 0.0751266132117
+  },
+  "source_sha256": "1fd5fc91c6604431ee919074d195cc6a7ab68baa76d158a45d14c4d6fc4c466d"
+}

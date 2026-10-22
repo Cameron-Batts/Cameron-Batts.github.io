@@ -1,0 +1,11 @@
+{
+  "status": "executed",
+  "elapsed_seconds": 46.041542768478,
+  "metrics": {
+    "sim.age": 61,
+    "F1": 0.03501142719801,
+    "F2": 0.04570535314159,
+    "hazard_ratio_10_ltv": 1.312684857726
+  },
+  "source_sha256": "9ddc8015de76f897963f8ac13a6889e6e11fd231f94873b581072f0f41bab83a"
+}

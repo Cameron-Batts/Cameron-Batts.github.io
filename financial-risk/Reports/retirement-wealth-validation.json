@@ -1,0 +1,25 @@
+{
+  "status": "executed",
+  "elapsed_seconds": 1.169139146805,
+  "metrics": {
+    "AIC.n": -43.646696157562,
+    "AIC.t": -45.941237721967,
+    "terminal_wealth": {
+      "equity": {
+        "median": 2701401.1529363915,
+        "lower_tail": [
+          1067599.1407111047,
+          823341.1722679536
+        ]
+      },
+      "strips": {
+        "median": 2598072.5008479194,
+        "lower_tail": [
+          1146281.351248575,
+          924926.0404160896
+        ]
+      }
+    }
+  },
+  "source_sha256": "8c58776d5d6a5e164e6a852f20577eacded31fabcd6f56b3b032be2af86b0174"
+}

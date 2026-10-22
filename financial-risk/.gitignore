@@ -1,0 +1,6 @@
+Data/*.RData
+Data/*.rds
+Data/*.csv
+.Rhistory
+.RData
+_cache/

@@ -1,0 +1,8 @@
+project:
+  type: default
+  execute-dir: project
+  output-dir: Reports
+format:
+  html:
+    embed-resources: true
+    toc: true

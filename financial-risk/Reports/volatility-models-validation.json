@@ -1,0 +1,98 @@
+{
+  "status": "executed",
+  "elapsed_seconds": 58.182225465775,
+  "metrics": {
+    "model.compare": [
+      {
+        "Model": "Current (no mean, sGARCH)",
+        "AIC": -6.68930595492,
+        "Violations": 0
+      },
+      {
+        "Model": "Alt 1 (AR(1) mean, sGARCH)",
+        "AIC": -6.691592709463,
+        "Violations": 0
+      },
+      {
+        "Model": "Alt 2 (no mean, gjrGARCH)",
+        "AIC": -6.709813235791,
+        "Violations": 0
+      }
+    ],
+    "results": [
+      {
+        "Label": "1-day @ 99%",
+        "Current": 9847262.830292359,
+        "Alt 1": 9545231.226156998,
+        "Alt 2": 10285919.578479897,
+        "Horizon": 1,
+        "Confidence": 0.99
+      },
+      {
+        "Label": "5-day @ 99%",
+        "Current": 22402680.252758753,
+        "Alt 1": 21000535.11143811,
+        "Alt 2": 23522521.005992636,
+        "Horizon": 5,
+        "Confidence": 0.99
+      },
+      {
+        "Label": "10-day @ 99%",
+        "Current": 33416559.309647422,
+        "Alt 1": 30782120.633619584,
+        "Alt 2": 34909316.95909659,
+        "Horizon": 10,
+        "Confidence": 0.99
+      },
+      {
+        "Label": "1-day @ 95%",
+        "Current": 7621179.192230352,
+        "Alt 1": 7325056.965851448,
+        "Alt 2": 7960672.687979673,
+        "Horizon": 1,
+        "Confidence": 0.95
+      },
+      {
+        "Label": "5-day @ 95%",
+        "Current": 17338304.413618036,
+        "Alt 1": 15933449.676965931,
+        "Alt 2": 18204992.669455346,
+        "Horizon": 5,
+        "Confidence": 0.95
+      },
+      {
+        "Label": "10-day @ 95%",
+        "Current": 25862373.217376117,
+        "Alt 1": 23189431.620784074,
+        "Alt 2": 27017676.34405085,
+        "Horizon": 10,
+        "Confidence": 0.95
+      },
+      {
+        "Label": "1-day @ 90%",
+        "Current": 6484199.985218675,
+        "Alt 1": 6191095.992081588,
+        "Alt 2": 6773045.5384584945,
+        "Horizon": 1,
+        "Confidence": 0.9
+      },
+      {
+        "Label": "5-day @ 90%",
+        "Current": 14751658.553982584,
+        "Alt 1": 13345419.883008061,
+        "Alt 2": 15489048.376993008,
+        "Horizon": 5,
+        "Confidence": 0.9
+      },
+      {
+        "Label": "10-day @ 90%",
+        "Current": 22004048.95410329,
+        "Alt 1": 19311441.86995175,
+        "Alt 2": 22986996.123820093,
+        "Horizon": 10,
+        "Confidence": 0.9
+      }
+    ]
+  },
+  "source_sha256": "9d9733f41d4eaf4143e8f437134b49e80507d088aba156c63d08cb10785a0f83"
+}

@@ -1,0 +1,182 @@
+---
+title: "Liability Matching and Bond Ladder Design"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Value a scheduled liability, match its duration with two Treasury securities, and construct a cash flow matching bond ladder.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+load("Data/liability_market.RData")
+```
+
+```{r}
+settle <- calendar_date(2025,05,03)
+```
+
+```{r}
+# Build a data table of the five liability payment dates and amounts
+df <- data.table(maturity = seq(from = calendar_date(2025,08,15), by = "6 months", length.out = 5))
+df <- df[, amount := c(100000, 105000, 110000, 115000, 120000)]
+
+# Merge ci STRIPS prices into the liability table by matching on maturity date
+liab <- merge(df, ci, by = "maturity", all.x = TRUE)
+
+# PV of each payment = amount * (ci_price / 100); sum to get total PV
+pv.liab <- sum(liab$amount * liab$ci_price / 100)
+```
+
+```{r}
+round(pv.liab,0)
+```
+
+```{r}
+# Time to maturity in years (using actual/365 day count)
+liab[, ttm  := as.numeric(maturity - settle) / 365]
+
+# Spot rate implied by each STRIPS price (semi-annual compounding)
+liab[, spot := spot_yield(ci_price, ttm)]
+
+# Modified duration of each individual cash flow
+liab[, dmod := ttm / (1 + spot / 2)]
+
+# PV weight of each cash flow relative to total liability PV
+liab[, wt := (amount * ci_price / 100) / pv.liab]
+
+# Liability modified duration = PV-weighted average of individual modified durations
+dmod.liab <- sum(liab$wt * liab$dmod)
+```
+
+```{r}
+round(dmod.liab,3)
+```
+
+```{r}
+# First-order approximation: percent change = -D_mod * change in yield
+dy    <- 0.001       # 10 basis points = 0.001 in decimal
+pcpb  <- -dmod.liab * dy
+```
+
+```{r}
+round(pcpb*100,3)
+```
+
+```{r}
+# Build a data table with the two candidate bonds
+portf <- data.table(
+  maturity = c(calendar_date(2026,5,15), calendar_date(2028,2,15)),
+  coupon   = c(0.03625, 0.02750)
+)
+
+# Pull in market clean prices from the coupons dataset
+portf <- coupons[portf, on = .(maturity, coupon)]
+
+# Standard Treasury pricing conventions
+freq      <- 2          # semi-annual coupons
+conv      <- "ACT/ACT"  # actual/actual day count
+comp.freq <- 2          # semi-annual compounding
+
+# Compute YTM for each bond from its clean price
+portf[, yield := mapply(
+  function(m, c, p) bond.yield(settle, m, c, freq, p, conv, comp.freq),
+  maturity, coupon, bd_price
+)]
+
+# Compute modified duration for each bond
+portf[, dmod := mapply(
+  function(m, c, y) bond.duration(settle, m, c, freq, y, conv, modified = TRUE, comp.freq),
+  maturity, coupon, yield
+)]
+```
+
+```{r}
+# Solve for Bond A weight using the duration-matching formula
+w1 <- (dmod.liab - portf$dmod[2]) / (portf$dmod[1] - portf$dmod[2])
+portf[, wt := c(w1, 1 - w1)]
+
+# Dollar market value allocated to each bond
+portf[, mv := wt * pv.liab]
+
+# Accrued interest for each bond on settlement date
+portf[, accint := mapply(
+  function(m, c) bond.TCF(settle, m, c, freq, conv)$accrued,
+  maturity, coupon
+)]
+
+# Full (dirty) price = clean price + accrued interest
+portf[, fullprice := bd_price + accint]
+
+# Face value = market value / (full price per $100)
+portf[, face := mv / (fullprice / 100)]
+```
+
+```{r}
+portf
+```
+
+```{r}
+# Assemble the ladder bonds with their maturities, coupons, and liability payments
+ladder <- df[, .(maturity, amount)]
+ladder[, coupon := c(0.02000, 0.01625, 0.01500, 0.02250, 0.02250)]
+
+# Merge in clean prices from the coupons dataset
+ladder <- merge(ladder, coupons, by = c("maturity", "coupon"))
+ladder <- ladder[order(maturity)]  # ensure chronological order
+
+n    <- nrow(ladder)
+face <- numeric(n)
+
+# Last bond: its payment = face * (1 + coupon/2), solve for face
+face[n] <- ladder$amount[n] / (1 + ladder$coupon[n] / 2)
+
+# Backward recursion: for each earlier bond, subtract coupon income
+# from longer-dated bonds still outstanding, then solve for face
+for (i in (n - 1):1) {
+  coupon_income <- sum(face[(i + 1):n] * ladder$coupon[(i + 1):n] / 2)
+  needed        <- ladder$amount[i] - coupon_income
+  face[i]       <- needed / (1 + ladder$coupon[i] / 2)
+}
+
+ladder[, face_value := face]
+ladder[, .(maturity, coupon, amount, face_value)]
+```
+
+```{r}
+# Define the diversified portfolio: 7 assets spanning domestic equity, international
+# equity, fixed income, real estate, and commodities
+asset_allocation <- data.table(
+  name   = c("Vanguard Total Stock Market ETF",
+             "Vanguard Developed Markets ETF",
+             "Vanguard Emerging Markets ETF",
+             "Vanguard Total Bond Market ETF",
+             "Vanguard Real Estate ETF",
+             "SPDR Gold Shares",
+             "Invesco QQQ Trust"),
+  ticker = c("VTI", "VEA", "VWO", "BND", "VNQ", "GLD", "QQQ"),
+  wgt    = c(0.35, 0.15, 0.10, 0.15, 0.10, 0.05, 0.10)
+)
+
+# Verify weights sum to 1
+stopifnot(sum(asset_allocation$wgt) == 1)
+
+asset_allocation
+```
+
+## Interpretation limits
+
+Prices are per 100 face value unless indicated. Results use the supplied historical snapshot and stated compounding conventions.

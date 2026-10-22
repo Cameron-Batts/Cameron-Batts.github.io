@@ -1,0 +1,39 @@
+{
+  "status": "executed",
+  "elapsed_seconds": 29.331769943237,
+  "metrics": {
+    "hyp.cscore": 758,
+    "hyp.oltv": 90,
+    "loans": 304709,
+    "model_AIC": [
+      {
+        "df": 1,
+        "AIC": 81875.65009456407,
+        "_row": "env$Model.CSCORE"
+      },
+      {
+        "df": 1,
+        "AIC": 82144.69047587334,
+        "_row": "env$Model.OLTV"
+      },
+      {
+        "df": 3,
+        "AIC": 82998.95109750058,
+        "_row": "env$Model.PURPOSE"
+      },
+      {
+        "df": 2,
+        "AIC": 82966.48859684593,
+        "_row": "env$Model.OCC"
+      },
+      {
+        "df": 7,
+        "AIC": 80355.10488219875,
+        "_row": "env$Model.ALL"
+      }
+    ],
+    "survival_120": 0.9525611810497,
+    "default_month_120": 0.0006192299981135
+  },
+  "source_sha256": "72e13cf6a2cf42913ea51e318926f635a168b005ec279c5067a0fe8654eb8abd"
+}

@@ -1,0 +1,249 @@
+---
+title: "Portfolio Return and Tail Risk Simulation"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Compare empirical bootstrap and fitted Student t simulations for a diversified seven-ETF portfolio.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+# Tickers for the seven ETFs chosen in portfolio specification
+tickers <- c("VTI", "VEA", "VWO", "BND", "VNQ", "GLD", "QQQ")
+
+# Portfolio weight on each ticker, matching the order above
+weights <- c(0.35, 0.15, 0.10, 0.15, 0.10, 0.05, 0.10)
+
+# Confirm weights sum to one
+stopifnot(abs(sum(weights) - 1) < 1e-8)
+```
+
+```{r}
+date_start <- "2020-01-01"        # first calendar date of the sample window
+date_end   <- "2022-12-31"        # last calendar date of the sample window
+ntickers   <- length(tickers)     # number of assets to loop over
+
+for (i in 1:ntickers) {
+  # Load adjusted price history for the requested ticker
+  px  <- read_market_history(tickers[i], 
+                    from = date_start, to = date_end)
+  px  <- Ad(px)                              # keep the adjusted close column only
+  ret <- na.omit(diff(px) / lag(px)) # daily discrete (simple) returns
+  if (i == 1) {
+    data <- ret                              # first ticker seeds the data object
+  } else {
+    data <- merge(data, ret)                 # later tickers are joined on by date
+  }
+}
+names(data)      <- tickers        # label columns with their ticker symbols
+data             <- na.omit(data)  # drop the leading NA row from the return calc
+matret_discrete  <- as.matrix(data) # store aligned returns as a plain numeric matrix
+head(data)
+head(matret_discrete)
+```
+
+```{r}
+# Daily discrete portfolio return: weighted average of the seven asset returns
+portf.DiscreteRet <- weighted_returns(matret_discrete, weights, discrete = TRUE)
+```
+
+```{r}
+# Compound $1 forward: running product of (1 + daily return)
+portf.Index <- cumprod(1 + portf.DiscreteRet)
+
+# Print the ending value
+portf.Index[length(portf.Index)]
+```
+
+```{r}
+ggplot(data.frame(date = index(data), value = as.numeric(portf.Index)),
+       aes(x = date, y = value)) +
+  geom_line() +
+  labs(x = NULL, y = "Portfolio Value ($)", title = "Growth of $1 Invested")
+```
+
+```{r}
+# Convert daily discrete returns to daily log returns
+portf.LogRet <- log(1 + portf.DiscreteRet)
+```
+
+```{r}
+# Convert xts object to data frame for ggplot
+df_plot <- data.frame(
+  Date   = as.Date(index(data)),
+  LogRet = as.numeric(portf.LogRet)
+)
+
+ggplot(df_plot, aes(x = Date, y = LogRet)) +
+  geom_line() +
+  labs(
+    title = "Log Returns of the Portfolio",
+    x     = "",
+    y     = "Daily Log Return"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title   = element_text(hjust = 0.5),
+    axis.title.x = element_text(hjust = 0.5),
+    axis.title.y = element_text(hjust = 0.5)
+  )
+```
+
+```{r}
+set.seed(123)                  # fix the seed so draws are reproducible
+num_paths       <- 5000        # number of simulated one year paths
+trading_days    <- 252         # trading days in one simulated year
+starting_wealth <- 100         # initial dollars invested in each path
+```
+
+```{r}
+simulated_log_returns <- matrix(
+  
+  sample(
+    as.numeric(portf.LogRet),          # pool of observed daily log returns
+    size    = trading_days * num_paths, # total draws needed (252 x 5000)
+    replace = TRUE                      # sample with replacement
+  ),
+  
+  nrow = trading_days,   # rows = days within a single path
+  ncol = num_paths       # columns = separate simulated paths
+)
+```
+
+```{r}
+# exp(log return) - 1 converts each log return back to a discrete return
+simulated_discrete_returns <- exp(simulated_log_returns) - 1
+```
+
+```{r}
+portfolio_values <- matrix(
+  NA,                       # fill with NA; we overwrite row by row below
+  nrow = trading_days + 1,  # one starting row plus one row per trading day
+  ncol = num_paths          # one column per simulated path
+)
+```
+
+```{r}
+# Every path starts at $100
+portfolio_values[1, ] <- starting_wealth
+```
+
+```{r}
+for (i in 1:num_paths) {
+  # For path i: grow $100 forward using the running product of (1 + daily return)
+  portfolio_values[2:(trading_days + 1), i] <-
+    portfolio_values[1, i] *
+    cumprod(1 + simulated_discrete_returns[, i])
+}
+```
+
+```{r}
+# Grab the ending value of each path (last row of the portfolio value matrix)
+terminal_wealth <- portfolio_values[trading_days + 1, ]
+
+# 5th percentile of the 5,000 terminal values
+var_5_boot <- quantile(
+  terminal_wealth,   # distribution of ending values across all paths
+  probs = 0.05       # the 5 percent lower tail cutoff
+)
+
+var_5_boot
+```
+
+```{r}
+# CalcVaRES is a analysis utility function (defined in analytics_support.R).
+# It takes a vector of terminal wealth values and a confidence level
+# and returns both VaR and ES based on the 5 percent left tail.
+boot_VaRES <- lower_tail_summary(terminal_wealth, 0.95)
+boot_VaRES
+```
+
+```{r}
+logret <- as.numeric(portf.LogRet)  # plain numeric vector for the moment functions
+
+portf.mean  <- mean(logret)         # average daily log return
+portf.sigma <- sd(logret)           # standard deviation of daily log returns
+portf.skew  <- skewness(logret)     # skewness (0 = symmetric)
+portf.kurt  <- kurtosis(logret)     # kurtosis (3 = Normal under Pearson convention)
+
+portf.mean
+portf.sigma
+portf.skew
+portf.kurt
+```
+
+```{r}
+# Fit a Normal distribution to the daily log returns by MLE
+n_fit <- fitdistr(logret, "normal")
+
+# AIC = 2 * (number of parameters) - 2 * (log likelihood)
+AIC_n <- 2 * length(n_fit$estimate) - 2 * n_fit$loglik
+AIC_n
+```
+
+```{r}
+# Fit a location-scale t distribution to the daily log returns by MLE
+t_fit <- fitdistr(logret, "t", method = "L-BFGS-B", lower = c(-Inf, 1e-8, 1e-4),
+                   control = list(parscale = c(sd(logret), sd(logret), 10), maxit = 2000))
+
+# AIC = 2 * (number of parameters) - 2 * (log likelihood)
+AIC_t <- 2 * length(t_fit$estimate) - 2 * t_fit$loglik
+AIC_t
+```
+
+```{r}
+set.seed(123)   # reproducible draw
+
+# Extract the three fitted t parameters
+m_hat  <- t_fit$estimate["m"]   # fitted location
+s_hat  <- t_fit$estimate["s"]   # fitted scale
+df_hat <- t_fit$estimate["df"]  # fitted degrees of freedom (controls tail weight)
+
+# Draw daily log returns from the fitted t: location + scale * standard t draw
+simulated_log_param <- matrix(
+  m_hat + s_hat * rt(trading_days * num_paths, df = df_hat),
+  nrow = trading_days,   # rows = days within a path
+  ncol = num_paths       # columns = separate simulated paths
+)
+
+# Convert simulated log returns to discrete returns
+simulated_discrete_param <- exp(simulated_log_param) - 1
+
+# Build the portfolio value matrix the same way as the bootstrap
+portfolio_values_param        <- matrix(NA, nrow = trading_days + 1, ncol = num_paths)
+portfolio_values_param[1, ]   <- starting_wealth   # every path starts at $100
+
+# Compound each path forward from $100
+for (i in 1:num_paths) {
+  portfolio_values_param[2:(trading_days + 1), i] <-
+    portfolio_values_param[1, i] *
+    cumprod(1 + simulated_discrete_param[, i])
+}
+```
+
+```{r}
+# Ending value of each parametric path
+terminal_wealth_param <- portfolio_values_param[trading_days + 1, ]
+
+# Use CalcVaRES on terminal wealth values at the 95% level
+param_VaRES <- lower_tail_summary(terminal_wealth_param, 0.95)
+param_VaRES
+```
+
+## Interpretation limits
+
+Independent resampling does not preserve volatility clustering. Lower-tail summaries of terminal wealth are wealth thresholds, not loss VaR. Fitted t log-return simulations can produce extreme wealth values; inspect their tails before interpretation.

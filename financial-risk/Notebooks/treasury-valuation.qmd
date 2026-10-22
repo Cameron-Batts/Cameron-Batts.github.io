@@ -1,0 +1,154 @@
+---
+title: "Treasury Valuation and Cash Flow Analysis"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Price Treasury securities, infer yields, value scheduled liabilities, and reconcile a bond ETF holding snapshot.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+load("Data/treasury_market.RData")
+```
+
+```{r}
+settle <- calendar_date(2025,05,03)
+mature <- calendar_date(2052,11,15)
+coupon <- 0.04
+freq = 2
+conv = 'ACT/ACT'            # daycount convention
+yield  <- 0.04363
+comp.freq = 2
+clean.price <- bond.price(settle,mature,coupon,freq,yield,conv,comp.freq)
+round(clean.price,4)
+```
+
+```{r}
+settle <- calendar_date(2025,05,03)
+mature <- calendar_date(2052,11,15)
+coupon <- 0.04
+freq = 2
+conv = 'ACT/ACT'  
+accint <- bond.TCF(settle,mature,coupon,freq,conv)$accrued
+round(accint,4)
+```
+
+```{r}
+settle <- calendar_date(2025,05,03)
+mature <- calendar_date(2032,05,15)
+coupon <- 0.02875
+freq = 2
+conv = 'ACT/ACT'  
+comp.freq = 2
+full.price <- 93.6907
+accint <- bond.TCF(settle,mature,coupon,freq,conv)$accrued
+clean.price <- full.price - accint
+yield <- bond.yield(settle,mature,coupon,freq,clean.price,conv,comp.freq)
+round(yield,4)
+```
+
+```{r}
+settle <- calendar_date(2025,05,03)
+mature <- calendar_date(2051,08,15)
+coupon <- 0.02
+freq = 2
+conv = 'ACT/ACT'
+comp.freq = 2
+```
+
+```{r}
+df <- data.table(maturity = coupons.dates(settle,mature,freq) )       
+df<-df[, coupons := coupon*100/2 ]                                        
+df<-df[, principal := c(rep(0,nrow(df)-1), 100) ]                          
+df
+```
+
+```{r}
+colnames(ci)
+setnames(ci,'price','ci.price')
+colnames(ci)
+
+colnames(sp)
+setnames(sp,'price','sp.price')
+colnames(sp)
+```
+
+```{r}
+# Merge coupon STRIPS prices onto cash flow table
+df <- merge(df, ci, by = 'maturity', all.x = TRUE)
+
+# Merge principal STRIPS prices onto cash flow table
+df <- merge(df, sp, by = 'maturity', all.x = TRUE)
+
+# PV of each coupon = coupon * (ci.price / 100)
+df <- df[, pv_coupon := coupons * ci.price / 100]
+
+# PV of principal = principal * (sp.price / 100)
+df <- df[, pv_principal := principal * sp.price / 100]
+
+# Discounted cash flows give the full price; subtract accrued interest for clean price.
+stopifnot(!anyNA(df$ci.price[df$coupons != 0]), !anyNA(df$sp.price[df$principal != 0]))
+strips.full.price <- sum(df$pv_coupon, na.rm = TRUE) + sum(df$pv_principal, na.rm = TRUE)
+strips.clean.price <- strips.full.price - bond.TCF(settle, mature, coupon, freq, conv)$accrued
+round(strips.clean.price, 3)
+```
+
+```{r}
+df <- data.table(maturity = seq(from=calendar_date(2025,11,15),to=calendar_date(2029,11,15),by="year"))
+df<-df[, amount := c(100000,105000,110000,115000,120000)]
+df
+```
+
+```{r}
+df <- merge(df, ci, by = 'maturity', all.x = TRUE)
+
+df <- df[, pv := amount * ci.price / 100]
+
+df
+
+total.pv <- sum(df$pv)
+round(total.pv, 0)
+```
+
+```{r}
+TLT_holdings
+```
+
+```{r}
+coupons
+```
+
+```{r}
+settle <- calendar_date(2025,05,03)
+
+coupons <- coupons[, pmid := (pbid + pask) / 2]
+
+tlt <- merge(TLT_holdings, coupons[, .(maturity, coupon, pmid)], by = c('maturity', 'coupon'), all.x = TRUE)
+
+tlt <- tlt[, accint := bond.TCF(settle, maturity, coupon, freq=2, 'ACT/ACT')$accrued, by = .(maturity, coupon)]
+
+tlt <- tlt[, full.price := pmid + accint]
+
+tlt <- tlt[, mkt.value := face * full.price / 100]
+
+total.mv <- sum(tlt$mkt.value) / 1e6
+round(total.mv, 0)
+```
+
+## Interpretation limits
+
+Prices are per 100 face value unless indicated. Results use the supplied historical snapshot and stated compounding conventions.

@@ -1,0 +1,194 @@
+---
+title: "Portfolio Tail Risk and Hedge Sizing"
+author: "Cameron Batts"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: true
+  message: false
+---
+
+Estimate five-day tail losses, market beta exposure, and an illustrative delta-based option hedge.
+
+## Scope
+
+Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.
+
+```{r}
+source("R/analytics_support.R")
+set.seed(42)
+```
+
+```{r}
+# Tickers for the seven ETFs in our portfolio (same order used for the weights)
+tickers <- c("VTI", "VEA", "VWO", "BND", "VNQ", "GLD", "QQQ")
+
+# Portfolio weight on each ticker, in the same order as the tickers vector
+weights <- c(0.35, 0.15, 0.10, 0.15, 0.10, 0.05, 0.10)
+
+# Notional value of the position, in dollars
+notional <- 100e6
+
+# Safety check that the weights sum to one
+stopifnot(abs(sum(weights) - 1) < 1e-8)
+```
+
+```{r}
+# Training sample start and end dates
+d1 <- "2020-01-01"
+d2 <- "2024-12-31"
+
+# Loop over the tickers and pull daily discrete returns for each one
+# The first ticker seeds the object and later tickers merge in by date
+for (i in 1:length(tickers)) {
+  tmp <- market_returns(tickers[i], d1, d2, discrete = TRUE)
+  if (i == 1) {
+    ret_disc <- tmp
+  } else {
+    ret_disc <- merge(ret_disc, tmp, join = "inner")
+  }
+}
+colnames(ret_disc) <- tickers
+
+# Pull SPY discrete returns and merge on the same trading days
+spy_disc <- market_returns("SPY", d1, d2, discrete = TRUE)
+all_ret <- merge(ret_disc, spy_disc, join = "inner")
+colnames(all_ret) <- c(tickers, "SPY")
+
+# Split back into the asset block and the SPY column
+asset_disc <- as.matrix(all_ret[, tickers])
+spy_disc_v <- as.vector(all_ret[, "SPY"])
+
+# Daily log returns for each asset and for SPY
+asset_log <- log(1 + asset_disc)
+spy_log <- log(1 + spy_disc_v)
+
+# Daily portfolio log return using the analysis utility
+# discrete = FALSE tells the helper to return log returns
+port_log <- as.vector(weighted_returns(asset_disc, weights, discrete = FALSE))
+
+# Quick check on the sample size
+length(port_log)
+```
+
+```{r}
+# Seed so the bootstrap is reproducible
+set.seed(16)
+
+# Bootstrap settings: number of draws and horizon in days
+B <- 100000
+horizon <- 5
+n_obs <- length(port_log)
+
+# Sample day indices with replacement, arranged as B rows of 5 days each
+# Saving idx lets us reuse the identical draws for SPY in section 3
+idx <- matrix(sample(1:n_obs, B * horizon, replace = TRUE), nrow = B)
+
+# 5-day portfolio log return for each draw is the sum across the 5 sampled days
+r5_port <- rowSums(matrix(port_log[idx], nrow = B))
+
+# Convert each 5-day log return into a dollar P&L on the notional
+pnl_port <- notional * (exp(r5_port) - 1)
+
+# 5-day 99% VaR and ES in dollars using the analysis utility
+var_es <- lower_tail_summary(pnl_port, 0.99)
+var_es
+
+# Store the ES (a negative dollar number) and its positive loss version
+ES0 <- as.numeric(var_es["ES"])
+ES0_loss <- -ES0
+ES0_loss
+```
+
+```{r}
+# Beta for each asset from a regression of asset log returns on SPY log returns
+betas <- rep(NA, length(tickers))
+for (i in 1:length(tickers)) {
+  fit <- lm(asset_log[, i] ~ spy_log)
+  betas[i] <- coef(fit)[2]
+}
+
+# Portfolio beta as the weighted sum of individual betas
+beta_port <- sum(weights * betas)
+beta_port
+
+# Sanity check: regress the portfolio return on SPY directly
+beta_check <- coef(lm(port_log ~ spy_log))[2]
+beta_check
+
+# Decomposition table: weight, beta, beta contribution, and dollar exposure
+decomp <- data.frame(
+  ticker = tickers,
+  weight = weights,
+  beta = round(betas, 3),
+  beta_contribution = round(weights * betas, 3),
+  dollar_exposure = scales::dollar(round(weights * betas * notional, 0))
+)
+decomp
+
+# Total SPY-equivalent dollar exposure of the portfolio
+spy_equiv_exposure <- beta_port * notional
+scales::dollar(round(spy_equiv_exposure, 0))
+```
+
+```{r}
+# SPY price at the end of the training sample, taken from the adjusted close
+spy_px <- read_market_history("SPY",  from = "2024-12-01", to = "2025-01-01")[, 6]
+S0 <- as.numeric(last(spy_px))
+S0
+
+# Put contract assumptions: ATM delta and contract multiplier
+delta_put <- -0.5
+mult <- 100
+
+# 5-day SPY log returns using the SAME bootstrap indices as section 1
+r5_spy <- rowSums(matrix(spy_log[idx], nrow = B))
+
+# 5-day SPY discrete return for each draw, needed for the price change
+spy_ret5 <- exp(r5_spy) - 1
+
+# P&L of one put contract on each draw under the delta approximation
+# delta is negative, so the contract gains when SPY falls
+pnl_one_put <- delta_put * mult * S0 * spy_ret5
+
+# Function that returns the hedged 99% ES for a given number of contracts
+hedged_ES <- function(Nc) {
+  pnl_hedged <- pnl_port + Nc * pnl_one_put
+  as.numeric(lower_tail_summary(pnl_hedged, 0.99)["ES"])
+}
+
+# Target ES: shrink the unhedged ES magnitude by 7.5%
+target_ES <- 0.925 * ES0
+
+# Upper bound for the search: the number of contracts that would short a SPY
+# notional equal to the portfolio's full SPY-equivalent exposure from section 2.
+# A 7.5% ES cut needs far fewer than this, so it safely brackets the root.
+Nc_max <- spy_equiv_exposure / (abs(delta_put) * mult * S0)
+
+# Solve for the contract count where hedged ES hits the target
+root <- uniroot(function(Nc) hedged_ES(Nc) - target_ES, interval = c(0, Nc_max))
+Nc_exact <- root$root
+Nc_exact
+# Minimum whole number of contracts
+Nc <- ceiling(Nc_exact)
+Nc
+
+# Verify the reduction with the whole number of contracts
+ES_hedged <- hedged_ES(Nc)
+c(unhedged = ES0, target = target_ES, hedged = ES_hedged)
+
+# Actual percent reduction achieved
+pct_cut <- (ES_hedged - ES0) / abs(ES0)
+pct_cut
+
+# Hedge notional and share of the SPY-equivalent exposure covered
+hedge_notional <- Nc * mult * abs(delta_put) * S0
+frac_hedged <- hedge_notional / spy_equiv_exposure
+c(hedge_notional = hedge_notional, frac_of_exposure = frac_hedged)
+```
+
+## Interpretation limits
+
+The hedge uses a constant option delta and excludes premium, gamma, implied volatility changes, expiry effects, and transaction costs. It is an illustrative scenario rather than an executable options strategy.
