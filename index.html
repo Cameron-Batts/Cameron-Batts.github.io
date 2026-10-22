@@ -643,7 +643,7 @@
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">The model precisely identified all 10 relevant predictors and set the remaining 90 coefficients to zero, demonstrating how regularization improves model parsimony and supports more interpretable, production-ready predictions.</div>
+<div class="card-body">In the low-noise synthetic example, LASSO selected all 10 informative predictors and set the remaining 90 coefficients to zero. This demonstrates sparsity; no held-out predictive advantage over ordinary regression was measured.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="lasso_regression_pipeline.html" target="_blank">View Analysis</a>
@@ -664,10 +664,10 @@
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Both the SVM and the feature-engineered logistic model achieved 100% accuracy and precision, demonstrating the value of kernel methods and domain-driven feature engineering for non-linear classification problems.</div>
+<div class="card-body">Both the SVM and the radial-feature logistic model achieved 100% in-sample accuracy, precision and recall. These fitting-data results demonstrate nonlinear representation; independent test performance was not measured.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="https://github.com/Cameron-Batts/Svm-Classification-Feature-Engineering/blob/main/Reports/Support%20Vector%20Machine%20Classification%20%26%20Manual%20Feature%20Engineering.pdf" target="_blank">View Analysis</a>
+<a class="project-link" href="svm_feature_engineering.html" target="_blank">View Analysis</a>
 <a class="project-link" href="https://github.com/Cameron-Batts/Svm-Classification-Feature-Engineering" target="_blank">View Code</a>
 </div>
 </div>
@@ -685,7 +685,7 @@
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">The tuned Random Forest generated $57,190 in predicted marketing profit, outperforming AdaBoost by 317% and the Decision Tree by 143%, directly demonstrating the business value of model selection and tuning.</div>
+<div class="card-body">The tuned random forest produced a simulated test-set campaign payoff of €57,190 under explicit assumptions, versus €13,700 for AdaBoost and €23,510 for the decision tree. These are retrospective simulated payoffs rather than realized profits.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="bank_marketing_prediction.html" target="_blank">View Analysis</a>
