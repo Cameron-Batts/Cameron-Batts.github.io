@@ -12,6 +12,8 @@ execute:
 
 Compare Cox proportional hazards specifications and estimate a hypothetical loan survival curve over 120 months.
 
+**Model diagnostic:** Some categorical coefficients may be infinite in the PURPOSE and full Cox fits. Effect estimates and hypothetical survival probabilities are provisional. The fit warnings remain visible below.
+
 ## Scope
 
 Results describe the supplied historical snapshot or a stated simulation. Model fit and scenario estimates are not evidence of performance on new observations. See the project README for the execution record and limitations.

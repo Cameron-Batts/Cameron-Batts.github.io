@@ -1,6 +1,6 @@
 {
   "status": "executed",
-  "elapsed_seconds": 29.331769943237,
+  "elapsed_seconds": 26.996118307114,
   "metrics": {
     "hyp.cscore": 758,
     "hyp.oltv": 90,
@@ -35,5 +35,9 @@
     "survival_120": 0.9525611810497,
     "default_month_120": 0.0006192299981135
   },
-  "source_sha256": "72e13cf6a2cf42913ea51e318926f635a168b005ec279c5067a0fe8654eb8abd"
+  "model_caveats": [
+    "Possible infinite categorical coefficients in PURPOSE and full Cox models; effect estimates and scenario predictions are provisional.",
+    "The 1,000-loan representation comparison also raised a categorical coefficient warning."
+  ],
+  "source_sha256": "1152045c13898373007ed21bb2cce3d92c543056bafb350b2a5d15b8660dcaa4"
 }

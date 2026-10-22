@@ -363,6 +363,10 @@ display: none;
 
 <p>Compare Cox proportional hazards specifications and estimate a
 hypothetical loan survival curve over 120 months.</p>
+<p><strong>Model diagnostic:</strong> Some categorical coefficients may
+be infinite in the PURPOSE and full Cox fits. Effect estimates and
+hypothetical survival probabilities are provisional. The fit warnings
+remain visible below.</p>
 <div id="scope" class="section level2">
 <h2>Scope</h2>
 <p>Results describe the supplied historical snapshot or a stated
@@ -408,8 +412,8 @@ fit_monthly &lt;- coxph(check_formula, data = check_monthly, ties = &quot;efron&
 rm(check_monthly, check_collapsed, fit_monthly, fit_collapsed)
 gc()</code></pre>
 <pre><code>##           used  (Mb) gc trigger   (Mb)  max used   (Mb)
-## Ncells 3101426 165.7    5751950  307.2   3293421  175.9
-## Vcells 7970747  60.9  182147780 1389.7 227637942 1736.8</code></pre>
+## Ncells 3101427 165.7    5751875  307.2   3293422  175.9
+## Vcells 7970809  60.9  182147840 1389.7 227638004 1736.8</code></pre>
 <pre class="r"><code>c(monthly_intervals = monthly_observations, compact_intervals = nrow(mortgage_history))</code></pre>
 <pre><code>## monthly_intervals compact_intervals 
 ##           9128461            304854</code></pre>
