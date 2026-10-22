@@ -410,7 +410,7 @@
 </section>
 <!-- FEATURED PROJECT -->
 <section class="section" id="featured" style="border-top: 1px solid var(--gray-100);">
-<h2 class="section-title">Featured Projects</h2><div class="projects-grid"><div class="project-card"><span class="tag">Power BI • Healthcare Operations</span><img alt="Power BI healthcare operations dashboard preview" class="card-img" src="powerbi_dashboard.png"/><h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3><p><strong>Problem:</strong> Operational and workforce data was spread across separate sources, making it difficult to quickly understand status, coverage, and trends.<br/><strong>Approach:</strong> Structured the data into a dashboard concept focused on visibility, headcount, readiness indicators, and leadership decision support.<br/><strong>Tools:</strong> Power BI, Excel<br/><strong>Outcome:</strong> Created a clear reporting view that supports faster review, better visibility, and more informed operational decisions.</p><div class="project-links"><a class="project-link" href="FlightDashboard.pdf">View Dashboard</a></div></div><div class="project-card"><span class="tag">Python • Business Analytics</span><h3>Retail Sales Analysis</h3><p><strong>Problem:</strong> Retail sales data needed a clearer view of product performance, revenue patterns, and business trends.<br/><strong>Approach:</strong> Cleaned and analyzed the data, then built visual summaries to highlight patterns across sales and product categories.<br/><strong>Tools:</strong> Python, pandas<br/><strong>Outcome:</strong> Translated raw sales data into clearer business insights that support product and sales decision making.</p><div class="project-links"><a class="project-link" href="retail_sales_analysis.html">View Analysis</a></div></div><div class="project-card"><span class="tag">Python • Machine Learning</span><h3>Bank Marketing Prediction</h3><p><strong>Problem:</strong> Marketing campaign data needed to be analyzed to better understand which customers were more likely to respond.<br/><strong>Approach:</strong> Prepared the dataset, evaluated predictors, and applied machine learning methods to identify customer response patterns.<br/><strong>Tools:</strong> Python, pandas, scikit-learn<br/><strong>Outcome:</strong> Identified key predictors and created a structured view of customer behavior for decision support.</p><div class="project-links"><a class="project-link" href="bank_marketing_prediction.html">View Analysis</a></div></div>
+<h2 class="section-title">Featured Projects</h2><div class="projects-grid"><div class="project-card"><span class="tag">Power BI • Healthcare Operations</span><img alt="Power BI healthcare operations dashboard preview" class="card-img" src="powerbi_dashboard.png"/><h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3><p><strong>Problem:</strong> Operational and workforce data was spread across separate sources, making it difficult to quickly understand status, coverage, and trends.<br/><strong>Approach:</strong> Structured the data into a dashboard concept focused on visibility, headcount, readiness indicators, and leadership decision support.<br/><strong>Tools:</strong> Power BI, Excel<br/><strong>Outcome:</strong> Created a clear reporting view that supports faster review, better visibility, and more informed operational decisions.</p><div class="project-links"><a class="project-link" href="FlightDashboard.pdf">View Dashboard</a></div></div><div class="project-card"><span class="tag">Python • Business Analytics</span><h3>Retail Sales Analysis</h3><p><strong>Problem:</strong> Department-level retail records needed consistent store-week summaries for comparison across store types.<br/><strong>Approach:</strong> Validated the store join, excluded holiday weeks and aggregated department sales into store-week totals.<br/><strong>Tools:</strong> Python, pandas<br/><strong>Outcome:</strong> Recomputed average nonholiday store-week sales of $1.370M, $816,922 and $472,742 for Types A, B and C; these are descriptive differences.</p><div class="project-links"><a class="project-link" href="retail_sales_analysis.html">View Analysis</a></div></div><div class="project-card"><span class="tag">Python • Machine Learning</span><h3>Bank Marketing Prediction</h3><p><strong>Problem:</strong> Marketing campaign data needed to be analyzed to better understand which customers were more likely to respond.<br/><strong>Approach:</strong> Prepared the dataset, evaluated predictors, and applied machine learning methods to identify customer response patterns.<br/><strong>Tools:</strong> Python, pandas, scikit-learn<br/><strong>Outcome:</strong> Identified key predictors and created a structured view of customer behavior for decision support.</p><div class="project-links"><a class="project-link" href="bank_marketing_prediction.html">View Analysis</a></div></div>
     <div class="project-card">
       <img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
       <span class="tag">SAS Viya • Industry Trends</span>
@@ -702,11 +702,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Applied K-Means and hierarchical (agglomerative) clustering in Python, tuning the number of clusters using Calinski-Harabasz, Davies-Bouldin, and Silhouette scores. Used PCA for dimensionality reduction and visual validation.</div>
+<div class="card-body">Applied K-Means and hierarchical (agglomerative) clustering in Python, tuning the number of clusters using Calinski-Harabasz, Davies-Bouldin, and Silhouette scores. Examined standardized PCA variance retention alongside clustering on original feature scales.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">All three scoring metrics agreed on an optimal k of 6, producing distinct customer segments that provided actionable groupings for targeted campaign planning and resource allocation.</div>
+<div class="card-body">All six internal-metric searches selected six clusters. Two PCA components retained 77.57% of standardized variance. Segment stability and campaign usefulness remain untested.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="mall_customer_segmentation.html" target="_blank">View Analysis</a>
@@ -723,11 +723,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Applied linear and logistic regression to used car pricing and bank marketing datasets. Interpreted exponentiated coefficients, computed a full confusion matrix including accuracy, precision, recall, and specificity, and built a simple linear regression model to predict sales from Facebook advertising budget.</div>
+<div class="card-body">Interpreted archived vehicle-price and bank-marketing model summaries, calculated metrics for an illustrative confusion matrix, and fitted advertising-sales regression on 200 included records. The two archived fitted models are unavailable.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Demonstrated that a one-year increase in model year is associated with a 12.5% increase in selling price, and that Facebook ad spend explains approximately 94.6% of variation in sales, providing actionable insight for pricing strategy and marketing budget allocation.</div>
+<div class="card-body">Advertising regression achieved in-sample R² of 0.9464 and predicted about $71,830 in sales at a $50,000 budget. These associations do not establish causal impact or held-out predictive performance.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="regression_classification_metrics.html" target="_blank">View Analysis</a>
@@ -744,11 +744,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Used Python and pandas to merge sales and store datasets, engineer store size categories, and apply GroupBy with method chaining to summarize weekly sales by store type, department, and holiday status.</div>
+<div class="card-body">Used pandas to validate a many-to-one join, exclude holiday records and aggregate department sales to store-week totals before comparing store types.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Found that Type A stores averaged $1.37M in weekly sales versus $816K for Type B and $472K for Type C, providing clear evidence that store type is a major driver of revenue and should inform resource allocation decisions.</div>
+<div class="card-body">Average nonholiday store-week sales were $1.370M for Type A, $816,922 for Type B and $472,742 for Type C. These descriptive comparisons do not control for store size or establish a causal effect.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="retail_sales_analysis.html" target="_blank">View Analysis</a>
