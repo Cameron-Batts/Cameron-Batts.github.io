@@ -1,4 +1,6 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bank Marketing Model Selection with a Custom Payoff | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.65 system-ui}main{max-width:950px;margin:auto;padding:32px 24px}h1{font:bold 2.4rem Georgia}h2{border-bottom:2px solid #e8c97a;margin-top:36px}pre{padding:18px;background:white;border-left:3px solid #c9a84c;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin:16px 0}summary{cursor:pointer}p{overflow-wrap:anywhere}a{color:#1a3560}img{max-width:100%;height:auto}</style><main><a href="/">← Portfolio</a><h1>Bank Marketing Model Selection with a Custom Payoff</h1><p><strong>Cameron Batts</strong></p><h2>Problem</h2><p>Compare classifiers using explicit marketing payoff assumptions rather than accuracy alone.</p><h2>Approach</h2><p>Use 45,211 bank marketing records and a 75/25 split with random_state=42. Drop day, month, duration, pdays and poutcome; one-hot encode categorical fields. Compare AdaBoost, a decision tree and a balanced random forest tuned across 12 parameter combinations using five-fold cross-validation.</p><h2>Reported results</h2><p>The saved test-set campaign payoff was €13,700 for AdaBoost, €23,510 for the decision tree and €57,190 for the tuned random forest. The forest used max_depth=5 and n_estimators=200. This is a retrospective simulation under assumed payoffs, not realized business profit.</p><h2>Evaluation limits</h2><p>The CV tuning objective values TN=+€10, FP=−€10, FN=−€100 and TP=+€100 per observation, while the final contacted-customer payoff uses only TP=+€100 and FP=−€10. These are different objectives. One-hot vocabulary was formed before splitting; fit encoders on training folds for stricter evaluation. A single random split and fixed payoffs do not establish deployment performance.</p><h2>Data</h2><p>The repository includes Data/bank_data.csv, a semicolon-delimited file with 45,211 rows and 17 input columns. Preserve existing data attribution; verify redistribution terms before reuse.</p><h2>Verification</h2><p>Original numerical outputs are retained. The revised notebook was syntax-checked, not fully rerun during this update.</p><details><summary>Python code</summary><pre>import numpy as np
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bank Marketing Model Selection with a Custom Payoff | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.65 system-ui}main{max-width:950px;margin:auto;padding:32px 24px}h1{font:bold 2.4rem Georgia}h2{border-bottom:2px solid #e8c97a;margin-top:36px}pre{padding:18px;background:white;border-left:3px solid #c9a84c;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin:16px 0}summary{cursor:pointer}p{overflow-wrap:anywhere}a{color:#1a3560}img{max-width:100%;height:auto}</style></head><body><main><a href="https://cameron-batts.github.io/">← Portfolio</a><h1>Bank Marketing Model Selection with a Custom Payoff</h1><p><strong>Cameron Batts</strong></p><h2>Problem</h2><p>Compare classifiers using explicit marketing payoff assumptions rather than accuracy alone.</p><h2>Approach</h2><p>Use 45,211 bank marketing records and a 75/25 split with random_state=42. Drop day, month, duration, pdays and poutcome; one-hot encode categorical fields. Compare AdaBoost, a decision tree and a balanced random forest tuned across 12 parameter combinations using five-fold cross-validation.</p><h2>Rerun results — October 22, 2026</h2><p>- AdaBoost: €13,700 (historical €13,700).
+- Decision tree: €24,000 (historical €23,510).
+- Tuned random forest: €57,190 (historical €57,190).</p><p>The simulation was rerun using the included data. Historical values remain in Reports/rerun_metrics.json. These are assumed campaign payoffs, not realized profit.</p><h2>Evaluation limits</h2><p>The CV tuning objective values TN=+€10, FP=−€10, FN=−€100 and TP=+€100 per observation, while the final contacted-customer payoff uses only TP=+€100 and FP=−€10. These are different objectives. One-hot vocabulary was formed before splitting; fit encoders on training folds for stricter evaluation. A single random split and fixed payoffs do not establish deployment performance.</p><h2>Data</h2><p>The repository includes Data/bank_data.csv, a semicolon-delimited file with 45,211 rows and 17 columns (16 predictors and the target). Preserve existing data attribution; verify redistribution terms before reuse.</p><h2>Verification</h2><p>All notebook code cells executed sequentially on October 22, 2026 in a fresh Python 3.12.14 namespace using scikit-learn 1.8.0, pandas 2.2.3 and NumPy 2.3.5. The included dataset produced 33,908 training rows and 11,303 test rows. Confusion-matrix totals and both payoff formulas were independently checked. Jupyter rendering and a separate clean-environment reinstall were not tested.</p><details><summary>Python code</summary><pre>import numpy as np
 import pandas as pd
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import AdaBoostClassifier
@@ -9,19 +11,7 @@ project_root = Path.cwd().parent if Path.cwd().name == &#x27;Notebooks&#x27; els
 bank_data_path = project_root / &#x27;Data&#x27; / &#x27;bank_data.csv&#x27;
 </pre></details><details><summary>Python code</summary><pre>bank_data = pd.read_csv(bank_data_path, sep=&#x27;;&#x27;)
 bank_data.head()
-</pre></details><pre>   age           job  marital  education default  balance housing loan  \
-0   58    management  married   tertiary      no     2143     yes   no   
-1   44    technician   single  secondary      no       29     yes   no   
-2   33  entrepreneur  married  secondary      no        2     yes  yes   
-3   47   blue-collar  married    unknown      no     1506     yes   no   
-4   33       unknown   single    unknown      no        1      no   no   
-
-   contact  day month  duration  campaign  pdays  previous poutcome   y  
-0  unknown    5   may       261         1     -1         0  unknown  no  
-1  unknown    5   may       151         1     -1         0  unknown  no  
-2  unknown    5   may        76         1     -1         0  unknown  no  
-3  unknown    5   may        92         1     -1         0  unknown  no  
-4  unknown    5   may       198         1     -1         0  unknown  no  </pre><details><summary>Python code</summary><pre>try:
+</pre></details><details><summary>Python code</summary><pre>try:
     bank_data.drop([&#x27;day&#x27;, &#x27;month&#x27;, &#x27;duration&#x27;, &#x27;pdays&#x27;, &#x27;poutcome&#x27;], axis=1, inplace=True)
 except NameError:
     print(&#x27;The object `bank_data` does not exist!&#x27;)</pre></details><p>Here, we encode the response variable (whether or not a customer subscribed a term deposit with the bank following a marketing campaign) with a binary indicator.</p><details><summary>Python code</summary><pre>try:
@@ -29,39 +19,11 @@ except NameError:
     bank_data.head()
 except NameError:
     print(&#x27;The object `bank_data` does not exist!&#x27;)</pre></details><details><summary>Python code</summary><pre>bank_data = pd.get_dummies(bank_data)
-bank_data.head()</pre></details><pre>   age  balance  campaign  previous  y  job_admin.  job_blue-collar  \
-0   58     2143         1         0  0       False            False   
-1   44       29         1         0  0       False            False   
-2   33        2         1         0  0       False            False   
-3   47     1506         1         0  0       False             True   
-4   33        1         1         0  0       False            False   
-
-   job_entrepreneur  job_housemaid  job_management  ...  education_unknown  \
-0             False          False            True  ...              False   
-1             False          False           False  ...              False   
-2              True          False           False  ...              False   
-3             False          False           False  ...               True   
-4             False          False           False  ...               True   
-
-   default_no  default_yes  housing_no  housing_yes  loan_no  loan_yes  \
-0        True        False       False         True     True     False   
-1        True        False       False         True     True     False   
-2        True        False       False         True    False      True   
-3        True        False       False         True     True     False   
-4        True        False        True        False     True     False   
-
-   contact_cellular  contact_telephone  contact_unknown  
-0             False              False             True  
-1             False              False             True  
-2             False              False             True  
-3             False              False             True  
-4             False              False             True  
-
-[5 rows x 33 columns]</pre><p>Let&#x27;s now separate the predictors from the response variable.</p><details><summary>Python code</summary><pre>try:
+bank_data.head()</pre></details><p>Let&#x27;s now separate the predictors from the response variable.</p><details><summary>Python code</summary><pre>try:
     X = bank_data.drop(&#x27;y&#x27;, axis=1)
     Y = bank_data[&#x27;y&#x27;]
 except NameError:
-    print(&#x27;The object `bank_data` does not exist!&#x27;)</pre></details><details><summary>Python code</summary><pre>X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=42, test_size=0.25)</pre></details><p>We want to use the available data to build a predictive model that can assist us in making our next marketing campaign more efficient.</p><p>Here are some quantities to keep in mind. Our department estimates that:</p><p>- a marketing contact with a potential customer costs around 10 Euros on average</p><p>- a successful contact (i.e. the customer subscribes a term deposit) generates on average 100 Euros of profits for the bank (say, present value net the cost of marketing).</p><p>Accordingly, we estimate that:</p><p>- the value associated with a true negative prediction from our model is 10 Euros (it saves us the waste of 10 Euros associated with the marketing contact)</p><p>- the value associated with a false positive prediction from our model is -10 Euros</p><p>- the value associated with a false negative prediction from our model is -100 Euros</p><p>- the value associated with a true positive prediction from our model is +100 Euros.</p><p>Let&#x27;s encode this information in a &quot;value function&quot; that we will use later.</p><details><summary>Python code</summary><pre>def value_function(y_true, y_pred, tn_value=10, fp_value=-10, fn_value=-100, tp_value=100):
+    print(&#x27;The object `bank_data` does not exist!&#x27;)</pre></details><details><summary>Python code</summary><pre>X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=42, test_size=0.25)</pre></details><p>We want to use the available data to build a predictive model that can assist us in making our next marketing campaign more efficient.</p><p>Here are some quantities to keep in mind. Our department estimates that:</p><ul><li>a marketing contact with a potential customer costs around 10 Euros on average</li></ul><ul><li>a successful contact (i.e. the customer subscribes a term deposit) generates on average 100 Euros of profits for the bank (say, present value net the cost of marketing).</li></ul><p>Accordingly, we estimate that:</p><ul><li>the value associated with a true negative prediction from our model is 10 Euros (it saves us the waste of 10 Euros associated with the marketing contact)</li></ul><ul><li>the value associated with a false positive prediction from our model is -10 Euros</li></ul><ul><li>the value associated with a false negative prediction from our model is -100 Euros</li></ul><ul><li>the value associated with a true positive prediction from our model is +100 Euros.</li></ul><p>Let&#x27;s encode this information in a &quot;value function&quot; that we will use later.</p><details><summary>Python code</summary><pre>def value_function(y_true, y_pred, tn_value=10, fp_value=-10, fn_value=-100, tp_value=100):
     sum_ = y_pred + y_true
     diff_ = y_pred - y_true
     tn_contrib = tn_value * np.mean((sum_ == 0) &amp; (diff_ == 0))
@@ -73,9 +35,7 @@ except NameError:
     n_estimators=2000,
     learning_rate=0.80,
     random_state=42)
-ada_boost.fit(X_train, Y_train)</pre></details><pre>AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=5,
-                                                    random_state=42),
-                   learning_rate=0.8, n_estimators=2000, random_state=42)</pre><p>We will also fit a conventional decision tree for reference.</p><details><summary>Python code</summary><pre>try:
+ada_boost.fit(X_train, Y_train)</pre></details><p>We will also fit a conventional decision tree for reference.</p><details><summary>Python code</summary><pre>try:
     tree = DecisionTreeClassifier(random_state=42).fit(X_train, Y_train)
 except NameError:
     print(&#x27;The objects `X_train, Y_train` do not exist!&#x27;)</pre></details><details><summary>Python code</summary><pre>ada_value = value_function(Y_test.values, ada_boost.predict(X_test))
@@ -85,14 +45,14 @@ print(&#x27;AdaBoost value function:&#x27;, ada_value)
 print(&#x27;Decision Tree value function:&#x27;, tree_value)
 
 # the decision tree scored higher so it looks like its doing better here than adaboost</pre></details><pre>AdaBoost value function: -0.7431655312748837
-Decision Tree value function: 0.9926568167743075
-</pre><p>Let&#x27;s now try to quantify what is the monetary impact of using the `AdaBoostClassifier` as opposed to the `DecisionTreeClassifier` on our marketing campaign.</p><p>First off, for the evaluation of a given model, we will assume that in our marketing campaign we will only contact customers that are predicted as subscribers by our model.</p><p>With this in mind, let&#x27;s create a &quot;marketing campaign profit function&quot;.</p><details><summary>Python code</summary><pre>def marketing_profits(model, X, Y, fp_value=-10, tp_value=100):
+Decision Tree value function: 1.0793594620897098
+</pre><p>Let&#x27;s now try to quantify what is the monetary impact of using the <code>AdaBoostClassifier</code> as opposed to the <code>DecisionTreeClassifier</code> on our marketing campaign.</p><p>First off, for the evaluation of a given model, we will assume that in our marketing campaign we will only contact customers that are predicted as subscribers by our model.</p><p>With this in mind, let&#x27;s create a &quot;marketing campaign profit function&quot;.</p><details><summary>Python code</summary><pre>def marketing_profits(model, X, Y, fp_value=-10, tp_value=100):
     tp_contrib = np.sum((model.predict(X) &gt; 0) &amp; (Y &gt; 0)) * tp_value
     fp_contrib = np.sum((model.predict(X) &gt; 0) &amp; (Y &lt; 1)) * fp_value
     return tp_contrib + fp_contrib</pre></details><details><summary>Python code</summary><pre>ada_prof = marketing_profits(ada_boost, X_test, Y_test)
 tree_prof = marketing_profits(tree, X_test, Y_test)
 percent_diff = ((ada_prof - tree_prof) / tree_prof) * 100
-print(&#x27;Percent change in profits using AdaBoost vs Decision Tree:&#x27;, percent_diff, &#x27;%&#x27;)</pre></details><pre>Percent change in profits using AdaBoost vs Decision Tree: -41.72692471288813 %
+print(&#x27;Percent change in profits using AdaBoost vs Decision Tree:&#x27;, percent_diff, &#x27;%&#x27;)</pre></details><pre>Percent change in profits using AdaBoost vs Decision Tree: -42.916666666666664 %
 </pre><details><summary>Python code</summary><pre>def _value_function(y, y_pred, **kwargs):
     return value_function(y, y_pred, **kwargs)
 
@@ -158,18 +118,20 @@ print(&#x27;\nRF vs Decision Tree profit change:&#x27;, round(rf_vs_tree, 2), &#
 rf_vs_ada = ((rf_prof - ada_prof) / ada_prof) * 100
 print(&#x27;RF vs AdaBoost profit change:&#x27;, round(rf_vs_ada, 2), &#x27;%&#x27;)
 </pre></details><pre>Best parameters: {&#x27;max_depth&#x27;: 5, &#x27;n_estimators&#x27;: 200}
-Best CV score: 7.150506182578337
+Best CV score: 7.151096153054153
 
 Value Function Results:
 AdaBoost: -0.7431655312748837
-Decision Tree: 0.9926568167743075
+Decision Tree: 1.0793594620897098
 Random Forest (tuned): 6.952136600902416
 
 Marketing Profits:
 AdaBoost: 13700
-Decision Tree: 23510
+Decision Tree: 24000
 Random Forest (tuned): 57190
 
-RF vs Decision Tree profit change: 143.26 %
+RF vs Decision Tree profit change: 138.29 %
 RF vs AdaBoost profit change: 317.45 %
-</pre><h2>Payoff interpretation</h2><p>The saved test-set campaign payoff was €13,700 for AdaBoost, €23,510 for the decision tree and €57,190 for the tuned random forest. The forest used max_depth=5 and n_estimators=200. This is a retrospective simulation under assumed payoffs, not realized business profit. The CV tuning objective values TN=+€10, FP=−€10, FN=−€100 and TP=+€100 per observation, while the final contacted-customer payoff uses only TP=+€100 and FP=−€10. These are different objectives. One-hot vocabulary was formed before splitting; fit encoders on training folds for stricter evaluation. A single random split and fixed payoffs do not establish deployment performance.</p></main></html>
+</pre><h2>Payoff interpretation</h2><p>- AdaBoost: €13,700 (historical €13,700).
+- Decision tree: €24,000 (historical €23,510).
+- Tuned random forest: €57,190 (historical €57,190).</p><p>The simulation was rerun using the included data. Historical values remain in Reports/rerun_metrics.json. These are assumed campaign payoffs, not realized profit.</p><p>The cross-validation objective and contacted-customer campaign payoff remain different. One-hot categories are still formed before the split. A single split and fixed assumptions do not establish deployment performance.</p></main></body></html>
