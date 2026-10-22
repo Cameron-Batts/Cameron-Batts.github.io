@@ -472,11 +472,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Built linear regression models in R on Ames housing data split by pre and post-2009 periods. Conducted NA analysis across 82 variables, applied outlier detection using diagnostic plots, and evaluated model fit with adjusted R-squared and residual analysis.</div>
+<div class="card-body">Reviewed pre/post-2009 price data and regression diagnostics, separating observed targets from an optional model-based price-replacement scenario. Revised R source is documented but has not been executed in this update.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Achieved an adjusted R-squared of 0.86 on the post-2009 model, identifying neighborhood, exterior quality, and floor square footage as significant price drivers and flagging outlier properties with anomalous sale prices for further review.</div>
+<div class="card-body">Verified 30 later records with the repeated price $142,769.70 across ten neighborhoods. These anomalies warrant review; they do not establish fraud, verified replacement values or improved held-out prediction.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="housing_outlier_regression.html" target="_blank">View Analysis</a>
@@ -493,11 +493,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Built a decision tree in R using rpart, addressing class imbalance through balanced sampling and a custom loss matrix to penalize missed defaults. Pruned the tree using cross-validation to reduce overfitting and improve generalizability.</div>
+<div class="card-body">Revised the R workflow to split before preprocessing, resample training rows only and explicitly fit a classifier. The workflow includes an illustrative loss matrix and fixed-cp pruning; it has not been executed in this update.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Produced an interpretable pruned tree that improved detection of high-risk borrowers, enabling more targeted risk classification and supporting more informed lending decisions.</div>
+<div class="card-body">Examined tree structure on data with 11.09% defaults and corrected leakage and model-type issues. The historical analysis reports no held-out metrics, so improved default detection remains unverified.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="loan_default_decision_tree.html" target="_blank">View Analysis</a>
@@ -514,11 +514,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Applied logistic regression in R to classify loan default risk, performing exploratory analysis across key variables, removing outliers, and evaluating model performance using cross-tabulation and coefficient interpretation.</div>
+<div class="card-body">Reviewed archived logistic results and reconstructed missing R source with training-only imputation, equal-row AIC comparisons and explicit default-positive metrics. The reconstructed workflow has not been executed in this update.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Identified credit grade and income as the strongest predictors of default, producing a model that supported more data-driven and transparent lending risk assessments.</div>
+<div class="card-body">The archived main threshold achieved 82.32% accuracy but only 20.90% default recall, with 1,137 test rows missing predictions. Corrected reporting makes coverage and threshold tradeoffs explicit.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="loan_default_logistic.html" target="_blank">View Analysis</a>
