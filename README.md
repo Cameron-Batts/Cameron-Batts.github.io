@@ -1,67 +1,49 @@
 # Cameron Batts | Data & Analytics Portfolio
 
-**Live Site:** [cameron-batts.github.io](https://cameron-batts.github.io)
-
----
+[Live portfolio](https://cameron-batts.github.io) · [GitHub profile](https://github.com/Cameron-Batts) · [LinkedIn](https://www.linkedin.com/in/cameron-batts)
 
 ## About
+Healthcare operations experience applied to business intelligence, statistical analysis, machine learning and NLP. The portfolio includes academic, adapted and collaborative projects with project-specific attribution.
 
-Personal data and analytics portfolio showcasing work in Power BI, Tableau, Python, R, SQL, and SAS Viya. Built during an MS in Quantitative Management (Business Analytics) at Duke University's Fuqua School of Business, alongside 15+ years of healthcare operations experience as an Active Duty Air Force officer at David Grant Medical Center (Travis AFB).
+## Power BI
+- [Healthcare Operations and Workforce Analytics](https://cameron-batts.github.io/powerbi_healthcare_operations.html)
 
----
+## Tableau
+- [Sales and Customer Analytics](https://cameron-batts.github.io/tableau_sales_dashboard.html)
 
-## Project Areas
+## Python
+- [LASSO Feature Selection](https://cameron-batts.github.io/lasso_regression_pipeline.html)
+- [SVM Feature Engineering](https://cameron-batts.github.io/svm_feature_engineering.html)
+- [Bank Marketing Prediction](https://cameron-batts.github.io/bank_marketing_prediction.html)
+- [Mall Customer Segmentation](https://cameron-batts.github.io/mall_customer_segmentation.html)
+- [Retail Sales Analysis](https://cameron-batts.github.io/retail_sales_analysis.html)
+- [Regression and Classification Metrics](https://cameron-batts.github.io/regression_classification_metrics.html)
+- [Sentiment Analysis Comparison](https://cameron-batts.github.io/sentiment_analysis_comparison.html)
+- [Multiclass Sentiment Classification](https://cameron-batts.github.io/multiclass_sentiment_classification.html)
+- [Word Embedding Comparison](https://cameron-batts.github.io/word_embedding_comparison.html)
+- [Book Topic Modeling and Financial NER](https://cameron-batts.github.io/book_topics_and_financial_ner.html)
+- [Financial Sentiment BERT Fine-tuning](https://cameron-batts.github.io/financial_sentiment_bert.html)
+- [Movie Review Sentiment BERT](https://cameron-batts.github.io/movie_review_sentiment_bert.html)
+- [Airline Refund LLM Evaluation](https://cameron-batts.github.io/airline_refund_llm_evaluation.html)
 
-### Power BI
-- Healthcare Operations & Workforce Analytics Dashboard
+## R
+- [Housing Price Time Series](https://cameron-batts.github.io/housing_price_timeseries.html)
+- [Housing Outlier Regression](https://cameron-batts.github.io/housing_outlier_regression.html)
+- [Benford Election Diagnostic](https://cameron-batts.github.io/benford_iran_election.html)
+- [Loan Default Decision Tree](https://cameron-batts.github.io/loan_default_decision_tree.html)
+- [Loan Default Logistic Regression](https://cameron-batts.github.io/loan_default_logistic.html)
+- [NYC Flight Delays](https://cameron-batts.github.io/nyc_flight_delay_analysis.html)
 
-### Tableau
-- North American Sales & Customer Analytics Dashboard
+## SAS Viya
+- [Insight Toys](https://cameron-batts.github.io/sas_insight_toys.html)
+- [Sports Products](https://cameron-batts.github.io/sas_sports_product.html)
+- [Customer Retail](https://cameron-batts.github.io/sas_customer_retail.html)
+- [Facility Products](https://cameron-batts.github.io/sas_facility_products.html)
+- [U.S. Aviation Trends](https://cameron-batts.github.io/sas_us_aviation_industry_trends.html)
+- [Megacorp Acquisition Scenario](https://cameron-batts.github.io/sas_megacorp_acquisition.html)
 
-### Python
-- LASSO Feature Selection & Regression Pipeline
-- SVM Classification with Kernel Trick & Feature Engineering
-- Bank Marketing Campaign Prediction & Profit Optimization
-- Mall Customer Segmentation via Clustering
-- Retail Sales & Store Performance Analysis
-- Regression Interpretation, Classification Metrics & Advertising Prediction
+## Source and publishing
+This is a static GitHub Pages site. Edit `index.html` for project cards and navigation. Each analysis is a standalone HTML page; project code lives in separate repositories. Power BI currently has a report and export here; its separate repository is pending creation. SQL is listed as a skill, with dedicated projects still forthcoming.
 
-### R
-- Housing Price Forecasting via Time Series & VAR Analysis
-- Housing Market Outlier Detection & Regression Analysis
-- Benford's Law Analysis: 2009 Iranian Election Data
-- Loan Default Prediction via Decision Trees
-- Loan Default Prediction via Logistic Regression
-- NYC Flight Delay & Anomaly Detection
-
-### SAS Viya
-- Insight Toys Product & Unit Production Analysis
-- Sports Product Line Performance Analysis
-- European Customer & Retail Sales Analysis
-- Sports Supplier & Facility Products Analysis
-
-### SQL
-- Coming soon
-
----
-
-## Certifications
-
-- Project Management Professional (PMP) -- April 2026
-- SAS Certified Specialist: Visual Analytics for SAS Viya -- March 2026
-
----
-
-## Education
-
-- MS Quantitative Management (Business Analytics) -- Duke University, Fuqua School of Business 
-- MBA -- University of Illinois, Gies College of Business
-- BA Healthcare Administration -- Ashford University
-
----
-
-## Connect
-
-- [LinkedIn](https://www.linkedin.com/in/cameron-batts)
-- [GitHub](https://github.com/cameron-batts)
-- Email: cameron.batts1@gmail.com
+## Validation scope
+Reports distinguish historical outputs, revised but unexecuted code, independent calculations and missing native dashboard tests. Use each report’s verification section for its specific limits. A dashboard preview does not establish a measured operational improvement.

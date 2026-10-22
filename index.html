@@ -36,6 +36,10 @@
     }
 
     html { scroll-behavior: smooth; }
+    section[id] { scroll-margin-top: 120px; }
+    :focus-visible { outline: 3px solid var(--teal-700); outline-offset: 3px; }
+    nav :focus-visible { outline-color: var(--teal-100); }
+    .project-card { min-width: 0; overflow-wrap: anywhere; }
 
     body {
       font-family: 'DM Sans', sans-serif;
@@ -113,7 +117,7 @@
       color: var(--teal-300);
       font-size: 2.5rem;
     }
-    .hero-text { flex: 1; min-width: 280px; }
+    .hero-text { flex: 1; min-width: min(280px, 100%); }
     .hero-text h1 {
       font-family: 'DM Serif Display', serif;
       font-size: clamp(2rem, 4vw, 3rem);
@@ -233,7 +237,7 @@
     /* ── PROJECT CARDS ── */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
       gap: 1.25rem;
     }
     .card-img {
@@ -365,7 +369,9 @@
       .hero-ctas { justify-content: center; }
       .section { padding: 2.5rem 1.25rem; }
       nav { padding: 0 1rem; }
-      .nav-links { display: none; }
+      nav { height: auto; min-height: 56px; flex-wrap: wrap; padding: .6rem 1rem; gap: .2rem; }
+      .nav-links { display: flex; width: 100%; flex-wrap: wrap; gap: .3rem; }
+      .nav-links a { height: 40px; padding: 0 .5rem; }
     }
   </style>
 </head>
@@ -383,7 +389,7 @@
 <!-- HERO -->
 <section class="hero">
 <img alt="Cameron Batts" class="hero-photo" src="headshot.jpg"/>
-<div class="hero-text"><h1>Turning Data Into Decisions</h1><p class="subtitle">Senior Healthcare Operations Manager</p><p>15+ years leading healthcare and military operations, now applying that operational lens to analytics. I build dashboards, models, and decision tools grounded in how leaders actually use data, not just how it is reported.</p><p>This portfolio reflects that shift, with Projects across Power BI, Tableau, R, Python, SQL, and SAS Viya, each focused on a real problem, the approach taken, and the insights produced. Open to roles in data and visual analytics.</p><p>PMP  ·  SAS Visual Analytics Certified  ·  MSQM Duke Fuqua  ·  MBA Illinois Gies  · BA Health Care Administration Ashford University · Active Duty USAF</p><div class="hero-ctas">
+<div class="hero-text"><h1>Turning Data Into Decisions</h1><p class="subtitle">Senior Healthcare Operations Manager</p><p>15+ years leading healthcare and military operations, now applying that operational lens to analytics. I build dashboards, models, and decision tools grounded in how leaders actually use data, not just how it is reported.</p><p>Explore dashboard, statistical modeling and NLP projects across Power BI, Tableau, R, Python and SAS Viya. Each report explains the problem, approach, findings and limitations. Open to roles in data and visual analytics.</p><p>PMP  ·  SAS Visual Analytics Certified  ·  MSQM Duke Fuqua  ·  MBA Illinois Gies  · BA Health Care Administration Ashford University · Active Duty USAF</p><div class="hero-ctas">
 <a class="btn btn-primary" href="#featured">View Analytics Projects</a>
 <a class="btn btn-outline" href="Cameron_Batts_Resume_PDF.pdf" target="_blank" rel="noopener">Resume</a>
 </div></div>
@@ -410,7 +416,7 @@
 </section>
 <!-- FEATURED PROJECT -->
 <section class="section" id="featured" style="border-top: 1px solid var(--gray-100);">
-<h2 class="section-title">Featured Projects</h2><div class="projects-grid"><div class="project-card"><span class="tag">Power BI • Healthcare Operations</span><img alt="Power BI healthcare operations dashboard preview" class="card-img" src="powerbi_dashboard.png"/><h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3><p><strong>Problem:</strong> Operational and workforce data was spread across separate sources, making it difficult to quickly understand status, coverage, and trends.<br/><strong>Approach:</strong> Structured the data into a dashboard concept focused on visibility, headcount, readiness indicators, and leadership decision support.<br/><strong>Tools:</strong> Power BI, Excel<br/><strong>Outcome:</strong> Created a clear reporting view that supports faster review, better visibility, and more informed operational decisions.</p><div class="project-links"><a class="project-link" href="FlightDashboard.pdf">View Dashboard</a></div></div><div class="project-card"><span class="tag">Python • Business Analytics</span><h3>Retail Sales Analysis</h3><p><strong>Problem:</strong> Department-level retail records needed consistent store-week summaries for comparison across store types.<br/><strong>Approach:</strong> Validated the store join, excluded holiday weeks and aggregated department sales into store-week totals.<br/><strong>Tools:</strong> Python, pandas<br/><strong>Outcome:</strong> Recomputed average nonholiday store-week sales of $1.370M, $816,922 and $472,742 for Types A, B and C; these are descriptive differences.</p><div class="project-links"><a class="project-link" href="retail_sales_analysis.html">View Analysis</a></div></div><div class="project-card"><span class="tag">Python • Machine Learning</span><h3>Bank Marketing Prediction</h3><p><strong>Problem:</strong> Marketing campaign data needed to be analyzed to better understand which customers were more likely to respond.<br/><strong>Approach:</strong> Prepared the dataset, evaluated predictors, and applied machine learning methods to identify customer response patterns.<br/><strong>Tools:</strong> Python, pandas, scikit-learn<br/><strong>Outcome:</strong> Identified key predictors and created a structured view of customer behavior for decision support.</p><div class="project-links"><a class="project-link" href="bank_marketing_prediction.html">View Analysis</a></div></div>
+<h2 class="section-title">Featured Projects</h2><div class="projects-grid"><div class="project-card"><img alt="Power BI healthcare dashboard preview" class="card-img" src="powerbi_dashboard.png"/><span class="tag">Power BI · Healthcare Operations</span><h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3><hr class="card-divider"/><div class="card-section"><div class="card-label">Problem</div><div class="card-body">Bring together personnel coverage, qualifications, inbound/outbound staffing and access-to-care views for healthcare operations.</div></div><div class="card-section"><div class="card-label">Approach</div><div class="card-body">Built a multi-page dashboard for workforce, qualifications, inbound/outbound staffing and access-to-care views; reviewed the supplied static export.</div></div><div class="card-section"><div class="card-label">Impact</div><div class="card-body">Demonstrates an integrated reporting view. The 85-person headline differs from the 96-count category and department views; definitions and snapshot scopes need reconciliation. Operational improvements have not been measured.</div></div><div class="project-links"><a class="project-link" href="powerbi_healthcare_operations.html" target="_blank" rel="noopener">View Analysis</a><a class="project-link" href="FlightDashboard.pdf" target="_blank" rel="noopener">View Export</a></div></div><div class="project-card"><span class="tag">Python • Business Analytics</span><h3>Retail Sales Analysis</h3><p><strong>Problem:</strong> Department-level retail records needed consistent store-week summaries for comparison across store types.<br/><strong>Approach:</strong> Validated the store join, excluded holiday weeks and aggregated department sales into store-week totals.<br/><strong>Tools:</strong> Python, pandas<br/><strong>Outcome:</strong> Recomputed average nonholiday store-week sales of $1.370M, $816,922 and $472,742 for Types A, B and C; these are descriptive differences.</p><div class="project-links"><a class="project-link" href="retail_sales_analysis.html">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Retail-Sales-Analysis" target="_blank" rel="noopener">View Code</a></div></div><div class="project-card"><span class="tag">Python • Machine Learning</span><h3>Bank Marketing Prediction</h3><p><strong>Problem:</strong> Marketing campaign data needed to be analyzed to better understand which customers were more likely to respond.<br/><strong>Approach:</strong> Prepared the dataset, evaluated predictors, and applied machine learning methods to identify customer response patterns.<br/><strong>Tools:</strong> Python, pandas, scikit-learn<br/><strong>Outcome:</strong> Identified key predictors and created a structured view of customer behavior for decision support.</p><div class="project-links"><a class="project-link" href="bank_marketing_prediction.html">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Bank-Marketing-Prediction" target="_blank" rel="noopener">View Code</a></div></div>
     <div class="project-card">
 <img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
 <span class="tag">SAS Viya • Industry Trends</span>
@@ -419,8 +425,8 @@
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Examine the 2020 disruption in passenger traffic, employment and quarterly airline finances.</div></div>
 <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the SAS PDF and independently parse all five included CSV tables. Calculate matched-month passenger changes, the latest observed workforce change and Q3 2019-to-Q3 2020 revenue changes. Treat SAS dots as missing values.</div></div>
 <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Quantifies the disruption from included data while separating observations, missing values and unvalidated forecasts.</div></div>
-<div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" target="_blank">View Code</a></div>
+<div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" target="_blank" rel="noopener">View Code</a></div>
 </div>
     <div class="project-card">
 <img alt="SAS Megacorp Acquisition Analysis" class="card-img" src="megacorp_exploration_dashboard.png"/>
@@ -430,8 +436,8 @@
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational reliability, facility geography and product-line profit in a fictional acquisition scenario.</div></div>
 <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review Exploration, Geography and Profit Analysis pages, including the PDF appendix that records object-specific year filters. Separate the headline KPI from the year-filtered product and trend objects.</div></div>
 <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Highlights loss-making product lines and the need to reconcile KPI filter scopes before interpreting acquisition risk.</div></div>
-<div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" target="_blank">View Code</a></div>
+<div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" target="_blank" rel="noopener">View Code</a></div>
 </div>
     </div>
 </section>
@@ -440,14 +446,14 @@
 <div class="section">
 <h2 class="section-title">Project Library</h2>
 <div class="tabs-wrapper">
-<div class="tab-bar">
-<button class="tab-btn active" data-tab="r">R</button><button class="tab-btn" data-tab="python">Python</button><button class="tab-btn" data-tab="powerbi">Power BI</button><button class="tab-btn" data-tab="tableau">Tableau</button><button class="tab-btn" data-tab="sql">SQL</button><button class="tab-btn" data-tab="sas">SAS Viya</button></div>
+<div class="tab-bar" role="tablist" aria-label="Project categories">
+<button class="tab-btn active" data-tab="r" id="tab-r" role="tab" aria-controls="r" aria-selected="true" tabindex="0">R</button><button class="tab-btn" data-tab="python" id="tab-python" role="tab" aria-controls="python" aria-selected="false" tabindex="-1">Python</button><button class="tab-btn" data-tab="powerbi" id="tab-powerbi" role="tab" aria-controls="powerbi" aria-selected="false" tabindex="-1">Power BI</button><button class="tab-btn" data-tab="tableau" id="tab-tableau" role="tab" aria-controls="tableau" aria-selected="false" tabindex="-1">Tableau</button><button class="tab-btn" data-tab="sql" id="tab-sql" role="tab" aria-controls="sql" aria-selected="false" tabindex="-1">SQL</button><button class="tab-btn" data-tab="sas" id="tab-sas" role="tab" aria-controls="sas" aria-selected="false" tabindex="-1">SAS Viya</button></div>
 <!-- PYTHON TAB -->
 <!-- SQL TAB -->
 <!-- TABLEAU TAB -->
 <!-- POWER BI TAB -->
 <!-- SAS VIYA TAB -->
-<div class="tab-panel active" id="r">
+<div class="tab-panel active" id="r" role="tabpanel" aria-labelledby="tab-r" tabindex="0">
 <div class="projects-grid">
 <div class="project-card">
 <span class="tag">R  ·  Statistical Analysis  ·  Digit Distributions</span>
@@ -466,8 +472,8 @@
 <div class="card-body">Reproduced approximate χ² p=0.4741 from 30 provincial totals, with seven expected digit counts below five. This small-sample diagnostic neither establishes conformity nor provides a verdict about election integrity.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="benford_iran_election.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Benford-Iran-Election" target="_blank">View Code</a>
+<a class="project-link" href="benford_iran_election.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Benford-Iran-Election" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -487,8 +493,8 @@
 <div class="card-body">Verified 30 later records with the repeated price $142,769.70 across ten neighborhoods. These anomalies warrant review; they do not establish fraud, verified replacement values or improved held-out prediction.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="housing_outlier_regression.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Housing-Outlier-Regression" target="_blank">View Code</a>
+<a class="project-link" href="housing_outlier_regression.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Housing-Outlier-Regression" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -508,8 +514,8 @@
 <div class="card-body">Examined tree structure on data with 11.09% defaults and corrected leakage and model-type issues. The historical analysis reports no held-out metrics, so improved default detection remains unverified.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="loan_default_decision_tree.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Loan-Default-Decision-Tree" target="_blank">View Code</a>
+<a class="project-link" href="loan_default_decision_tree.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Loan-Default-Decision-Tree" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -529,8 +535,8 @@
 <div class="card-body">The archived main threshold achieved 82.32% accuracy but only 20.90% default recall, with 1,137 test rows missing predictions. Corrected reporting makes coverage and threshold tradeoffs explicit.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="loan_default_logistic.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Loan-Default-Logistic" target="_blank">View Code</a>
+<a class="project-link" href="loan_default_logistic.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Loan-Default-Logistic" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -550,8 +556,8 @@
 <div class="card-body">Among weather-matched flights with observed delays, the mean departure delay was 12.635 minutes and median was −2 minutes. Exploratory plots do not establish ranked weather drivers or operational causes.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="nyc_flight_delay_analysis.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/NYC-Flight-Delay-Analysis" target="_blank">View Code</a>
+<a class="project-link" href="nyc_flight_delay_analysis.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/NYC-Flight-Delay-Analysis" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -571,12 +577,12 @@
 <div class="card-body">Verified 444 consecutive overlapping months from 1987 through 2023. Flagged full-sample seasonal-adjustment leakage in historical comparisons; improved forecasting performance and structural causality remain unverified.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="housing_price_timeseries.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Housing-Price-Timeseries" target="_blank">View Code</a>
+<a class="project-link" href="housing_price_timeseries.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Housing-Price-Timeseries" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 </div>
-</div><div class="tab-panel" id="python">
+</div><div class="tab-panel" id="python" role="tabpanel" aria-labelledby="tab-python" tabindex="0">
 <div class="projects-grid">
 <div class="project-card"><span class="tag">Python · LLM Evaluation · Prompt Engineering</span><h3>Airline Refund Decisions: LLM Prompt Evaluation</h3><hr class="card-divider"/>
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">LLM-generated policy decisions can be incorrect despite valid formatting and can follow instructions embedded in untrusted case text.</div></div>
@@ -654,8 +660,8 @@
 <div class="card-body">In the low-noise synthetic example, LASSO selected all 10 informative predictors and set the remaining 90 coefficients to zero. This demonstrates sparsity; no held-out predictive advantage over ordinary regression was measured.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="lasso_regression_pipeline.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Lasso-Regression-Pipeline" target="_blank">View Code</a>
+<a class="project-link" href="lasso_regression_pipeline.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Lasso-Regression-Pipeline" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -675,8 +681,8 @@
 <div class="card-body">Both the SVM and the radial-feature logistic model achieved 100% in-sample accuracy, precision and recall. These fitting-data results demonstrate nonlinear representation; independent test performance was not measured.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="svm_feature_engineering.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Svm-Classification-Feature-Engineering" target="_blank">View Code</a>
+<a class="project-link" href="svm_feature_engineering.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Svm-Classification-Feature-Engineering" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -696,8 +702,8 @@
 <div class="card-body">The tuned random forest produced a simulated test-set campaign payoff of €57,190 under explicit assumptions, versus €13,700 for AdaBoost and €23,510 for the decision tree. These are retrospective simulated payoffs rather than realized profits.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="bank_marketing_prediction.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Bank-Marketing-Prediction" target="_blank">View Code</a>
+<a class="project-link" href="bank_marketing_prediction.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Bank-Marketing-Prediction" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -717,8 +723,8 @@
 <div class="card-body">All six internal-metric searches selected six clusters. Two PCA components retained 77.57% of standardized variance. Segment stability and campaign usefulness remain untested.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="mall_customer_segmentation.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Mall-Customer-Segmentation" target="_blank">View Code</a>
+<a class="project-link" href="mall_customer_segmentation.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Mall-Customer-Segmentation" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -738,8 +744,8 @@
 <div class="card-body">Advertising regression achieved in-sample R² of 0.9464 and predicted about $71,830 in sales at a $50,000 budget. These associations do not establish causal impact or held-out predictive performance.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="regression_classification_metrics.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Regression-Classification-Metrics" target="_blank">View Code</a>
+<a class="project-link" href="regression_classification_metrics.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Regression-Classification-Metrics" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 <div class="project-card">
@@ -759,36 +765,16 @@
 <div class="card-body">Average nonholiday store-week sales were $1.370M for Type A, $816,922 for Type B and $472,742 for Type C. These descriptive comparisons do not control for store size or establish a causal effect.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="retail_sales_analysis.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Retail-Sales-Analysis" target="_blank">View Code</a>
+<a class="project-link" href="retail_sales_analysis.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Retail-Sales-Analysis" target="_blank" rel="noopener">View Code</a>
 </div>
 </div>
 </div>
-</div><div class="tab-panel" id="powerbi">
+</div><div class="tab-panel" id="powerbi" role="tabpanel" aria-labelledby="tab-powerbi" tabindex="0">
 <div class="projects-grid">
-<div class="project-card">
-<img alt="Power BI Healthcare Dashboard" class="card-img" src="powerbi_dashboard.png"/>
-<span class="tag">Power BI  ·  Healthcare Analytics  ·  Workforce Planning</span>
-<h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3>
-<hr class="card-divider"/>
-<div class="card-section">
-<div class="card-label">Problem</div>
-<div class="card-body">Senior leadership at David Grant Medical Center lacked real-time visibility into personnel readiness, SEI qualification coverage, deployment status, and access to care across 7 imaging departments serving 276,000+ patients annually.</div>
+<div class="project-card"><img alt="Power BI healthcare dashboard preview" class="card-img" src="powerbi_dashboard.png"/><span class="tag">Power BI · Healthcare Operations</span><h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3><hr class="card-divider"/><div class="card-section"><div class="card-label">Problem</div><div class="card-body">Bring together personnel coverage, qualifications, inbound/outbound staffing and access-to-care views for healthcare operations.</div></div><div class="card-section"><div class="card-label">Approach</div><div class="card-body">Built a multi-page dashboard for workforce, qualifications, inbound/outbound staffing and access-to-care views; reviewed the supplied static export.</div></div><div class="card-section"><div class="card-label">Impact</div><div class="card-body">Demonstrates an integrated reporting view. The 85-person headline differs from the 96-count category and department views; definitions and snapshot scopes need reconciliation. Operational improvements have not been measured.</div></div><div class="project-links"><a class="project-link" href="powerbi_healthcare_operations.html" target="_blank" rel="noopener">View Analysis</a><a class="project-link" href="FlightDashboard.pdf" target="_blank" rel="noopener">View Export</a></div></div>
 </div>
-<div class="card-section">
-<div class="card-label">Approach</div>
-<div class="card-body">Developed Power BI dashboards integrating personnel, SEI qualification, deployment, and access-to-care data across MRI, CT, Mammography, IR, and Nuclear Medicine to surface operational gaps for leadership.</div>
-</div>
-<div class="card-section">
-<div class="card-label">Impact</div>
-<div class="card-body">Enabled data-driven staffing, throughput, and resource allocation decisions for senior leadership overseeing 36,000 diagnostic procedures and $6.4M in clinical operations.</div>
-</div>
-<div class="project-links">
-<a class="project-link" href="FlightDashboard.pdf" target="_blank">View Dashboard</a>
-</div>
-</div>
-</div>
-</div><div class="tab-panel" id="tableau">
+</div><div class="tab-panel" id="tableau" role="tabpanel" aria-labelledby="tab-tableau" tabindex="0">
 <div class="projects-grid">
 <div class="project-card">
 <img alt="Tableau Sales Dashboard" class="card-img" src="tableau_dashboard.png"/>
@@ -808,18 +794,18 @@
 <div class="card-body">Recomputed $2.327M sales and $292,297 profit from the included spreadsheet. West leads regional sales at $739,814; Technology totals $272,419 for calendar year 2025. Supplied workbook definitions confirm separate executive and sales sources; formulas and declared actions were inspected, while live behavior remains untested.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="tableau_sales_dashboard.html" target="_blank">View Analysis</a>
-<a class="project-link" href="Tableau_Sales_Dashboard.pdf" target="_blank">View Export</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Tableau-Sales-Dashboard" target="_blank">View Repository</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/Tableau-Sales-Dashboard/tree/main/Workbooks" target="_blank">View Workbooks</a>
+<a class="project-link" href="tableau_sales_dashboard.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="Tableau_Sales_Dashboard.pdf" target="_blank" rel="noopener">View Export</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Tableau-Sales-Dashboard" target="_blank" rel="noopener">View Repository</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/Tableau-Sales-Dashboard/tree/main/Workbooks" target="_blank" rel="noopener">View Workbooks</a>
 </div>
 </div>
 </div>
-</div><div class="tab-panel" id="sql">
+</div><div class="tab-panel" id="sql" role="tabpanel" aria-labelledby="tab-sql" tabindex="0">
 <div class="projects-grid">
 <p style="color: var(--text-muted); font-size: .95rem; margin-top: .5rem;">SQL projects coming soon.</p>
 </div>
-</div><div class="tab-panel" id="sas">
+</div><div class="tab-panel" id="sas" role="tabpanel" aria-labelledby="tab-sas" tabindex="0">
 <div class="projects-grid">
           <div class="project-card">
 <img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
@@ -829,8 +815,8 @@
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Examine the 2020 disruption in passenger traffic, employment and quarterly airline finances.</div></div>
 <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the SAS PDF and independently parse all five included CSV tables. Calculate matched-month passenger changes, the latest observed workforce change and Q3 2019-to-Q3 2020 revenue changes. Treat SAS dots as missing values.</div></div>
 <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Quantifies the disruption from included data while separating observations, missing values and unvalidated forecasts.</div></div>
-<div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" target="_blank">View Code</a></div>
+<div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" target="_blank" rel="noopener">View Code</a></div>
 </div>
           <div class="project-card">
 <img alt="SAS Megacorp Acquisition Analysis" class="card-img" src="megacorp_exploration_dashboard.png"/>
@@ -840,8 +826,8 @@
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational reliability, facility geography and product-line profit in a fictional acquisition scenario.</div></div>
 <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review Exploration, Geography and Profit Analysis pages, including the PDF appendix that records object-specific year filters. Separate the headline KPI from the year-filtered product and trend objects.</div></div>
 <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Highlights loss-making product lines and the need to reconcile KPI filter scopes before interpreting acquisition risk.</div></div>
-<div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" target="_blank">View Code</a></div>
+<div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" target="_blank" rel="noopener">View Code</a></div>
 </div>
 <div class="project-card">
 <img alt="SAS Insight Toys Report" class="card-img" src="sas_insight_toys.png"/>
@@ -861,9 +847,9 @@
 <div class="card-body">The export shows 4,017,238 production, 115,288 discards and a 4,328,016 target, with a labeled average yield of 90%. The aggregate production/target ratio is 92.82%; these are different statistics. A below-50% display rule is documented.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="sas_insight_toys.html" target="_blank">View Analysis</a>
-<a class="project-link" href="Toys_Report_on_Apr_25__2026.pdf" target="_blank">View Export</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Insight-Toys" target="_blank">View Repository</a>
+<a class="project-link" href="sas_insight_toys.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="Toys_Report_on_Apr_25__2026.pdf" target="_blank" rel="noopener">View Export</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Insight-Toys" target="_blank" rel="noopener">View Repository</a>
 </div>
 </div>
 <div class="project-card">
@@ -884,9 +870,9 @@
 <div class="card-body">Clothes is the largest displayed category with 884 products. The twelve category values sum to 3,151, consistent with the rounded 3.2K headline. Product counts do not measure sales volume, available stock or inventory improvement.</div>
 </div>
 <div class="project-links">
-<a class="project-link" href="sas_sports_product.html" target="_blank">View Analysis</a>
-<a class="project-link" href="Product_Analysis_on_Apr_25__2026.pdf" target="_blank">View Export</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Sports-Product" target="_blank">View Repository</a>
+<a class="project-link" href="sas_sports_product.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="Product_Analysis_on_Apr_25__2026.pdf" target="_blank" rel="noopener">View Export</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Sports-Product" target="_blank" rel="noopener">View Repository</a>
 </div>
 </div>
 <div class="project-card">
@@ -897,8 +883,8 @@
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore customer distribution and retail activity in a Europe-filtered SAS dashboard.</div></div>
 <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the customer bubble map, retail KPI and PDF filter appendix. The appendix explicitly applies Continent Name = Europe to the customer map and order object.</div></div>
 <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Presents a geographic customer view and identifies the KPI definitions needed before operational use.</div></div>
-<div class="project-links"><a class="project-link" href="sas_customer_retail.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Customer-Retail-Analysis" target="_blank">View Code</a></div>
+<div class="project-links"><a class="project-link" href="sas_customer_retail.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Customer-Retail-Analysis" target="_blank" rel="noopener">View Code</a></div>
 </div>
 <div class="project-card">
 <img alt="SAS Facility Products Report" class="card-img" src="sas_facility_products.png"/>
@@ -908,8 +894,8 @@
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">Compare supplier quantities and product assortment across regional dashboard controls.</div></div>
 <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the supplier treemap, product-category quantity bars and product-group count table. Region buttons show Australia/Pacific, Europe and North America.</div></div>
 <div class="card-section"><div class="card-label">Impact</div><div class="card-body">Separates supplier quantity comparisons from assortment counts and makes the export readable without implying verified inventory totals.</div></div>
-<div class="project-links"><a class="project-link" href="sas_facility_products.html" target="_blank">View Analysis</a>
-<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Facility-Products" target="_blank">View Code</a></div>
+<div class="project-links"><a class="project-link" href="sas_facility_products.html" target="_blank" rel="noopener">View Analysis</a>
+<a class="project-link" href="https://github.com/Cameron-Batts/SAS-Facility-Products" target="_blank" rel="noopener">View Code</a></div>
 </div>
 </div>
 </div></div><!-- end tabs-wrapper -->
@@ -925,11 +911,11 @@
 <div class="contact-icon">✉</div>
         cameron.batts1@gmail.com
       </a>
-<a class="contact-item" href="https://www.linkedin.com/in/cameron-batts" target="_blank">
+<a class="contact-item" href="https://www.linkedin.com/in/cameron-batts" target="_blank" rel="noopener">
 <div class="contact-icon">in</div>
         LinkedIn
       </a>
-<a class="contact-item" href="https://github.com/cameron-batts" target="_blank">
+<a class="contact-item" href="https://github.com/cameron-batts" target="_blank" rel="noopener">
 <div class="contact-icon">⌥</div>
         GitHub
       </a>
@@ -940,17 +926,32 @@
 <p>Cameron Batts  ·  Data &amp; Analytics Portfolio</p>
 </footer>
 <script>
-  // Tab switching
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.dataset.tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(target).classList.add('active');
+  const tabs = [...document.querySelectorAll('.tab-btn')];
+  function activateTab(button, moveFocus = false) {
+    tabs.forEach(tab => {
+      const selected = tab === button;
+      tab.classList.toggle('active', selected);
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      document.getElementById(tab.dataset.tab).classList.toggle('active', selected);
+    });
+    if (moveFocus) button.focus();
+  }
+  tabs.forEach((button, index) => {
+    button.addEventListener('click', () => activateTab(button));
+    button.addEventListener('keydown', event => {
+      let next;
+      if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      activateTab(tabs[next], true);
     });
   });
 </script>
 </body>
 </html>
+
 
