@@ -442,7 +442,7 @@
 <div class="tab-panel active" id="r">
 <div class="projects-grid">
 <div class="project-card">
-<span class="tag">R  ·  Statistical Analysis  ·  Fraud Detection</span>
+<span class="tag">R  ·  Statistical Analysis  ·  Digit Distributions</span>
 <h3>Benford's Law Analysis: 2009 Iranian Election Data</h3>
 <hr class="card-divider"/>
 <div class="card-section">
@@ -455,7 +455,7 @@
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">The chi-squared test produced a p-value of 0.4741, indicating vote totals did not significantly deviate from Benford's Law, providing a statistically grounded perspective on the fraud allegations using mathematical forensics.</div>
+<div class="card-body">Reproduced approximate χ² p=0.4741 from 30 provincial totals, with seven expected digit counts below five. This small-sample diagnostic neither establishes conformity nor provides a verdict about election integrity.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="benford_iran_election.html" target="_blank">View Analysis</a>
@@ -535,11 +535,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Analyzed 336,776 flights from the nycflights13 dataset in R, joining flight and weather data to examine relationships between delays, cancellations, and conditions including visibility, wind speed, precipitation, and temperature.</div>
+<div class="card-body">Reviewed 336,776 flights, checked airport-hour join coverage and documented 1,556 flights without matched weather. Weather scatterplots cover only observed departure delays over 100 minutes.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Surfaced that low visibility and high wind gusts were the strongest weather-related delay drivers, providing actionable patterns to support operational planning and delay mitigation decisions.</div>
+<div class="card-body">Among weather-matched flights with observed delays, the mean departure delay was 12.635 minutes and median was −2 minutes. Exploratory plots do not establish ranked weather drivers or operational causes.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="nyc_flight_delay_analysis.html" target="_blank">View Analysis</a>
@@ -556,11 +556,11 @@
 </div>
 <div class="card-section">
 <div class="card-label">Approach</div>
-<div class="card-body">Pulled monthly S&amp;P/Case-Shiller Home Price Index and housing starts data from the FRED API (1987-2023). Applied ARIMA modeling with bootstrapped bagging and a Vector Autoregression (VAR) to capture simultaneous relationships between prices and starts. Performed Granger causality testing and Impulse Response Function analysis.</div>
+<div class="card-body">Retained extended historical demonstrations and added a workflow using included FRED snapshots, monthly log growth, training-only model fitting and a fixed 2014–2015 test period for seasonal-naive, ARIMA and VAR forecasts. Revised R code is unexecuted.</div>
 </div>
 <div class="card-section">
 <div class="card-label">Impact</div>
-<div class="card-body">Found that housing starts Granger-cause price growth with effects peaking within 2-3 months and dissipating within 1.5-2 years. Bagging improved upon the baseline ARIMA forecast by reducing both parameter and model uncertainty.</div>
+<div class="card-body">Verified 444 consecutive overlapping months from 1987 through 2023. Flagged full-sample seasonal-adjustment leakage in historical comparisons; improved forecasting performance and structural causality remain unverified.</div>
 </div>
 <div class="project-links">
 <a class="project-link" href="housing_price_timeseries.html" target="_blank">View Analysis</a>
