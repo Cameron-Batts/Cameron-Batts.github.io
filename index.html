@@ -594,7 +594,7 @@
 </div>
 </div><div class="tab-panel" id="python" role="tabpanel" aria-labelledby="tab-python" tabindex="0">
 <div class="projects-grid">
-<div class="project-card">
+<div class="project-card" id="project-vibefinder">
 <span class="tag">Python · Applied AI · Reliability Testing</span>
 <h3>VibeFinder: Explainable Music Recommendations</h3>
 <hr class="card-divider"/>
@@ -604,6 +604,36 @@
 <div class="project-links"><a class="project-link" href="https://github.com/Cameron-Batts/vibefinder-applied-ai" target="_blank" rel="noopener">View Project &amp; Code</a><a class="project-link" href="https://github.com/Cameron-Batts/vibefinder-applied-ai/tree/main/tests" target="_blank" rel="noopener">View Reliability Tests</a></div>
 </div>
 
+
+<div class="project-card" id="project-bughound">
+<span class="tag">Python · Agent Workflows · Static Safeguards</span>
+<h3>BugHound: Reviewed Python Fix Proposals</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">A proposed code fix can parse successfully and receive a high score while still changing program behavior.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Combined syntax-aware issue detection and source edits with a conservative policy that routes executable changes and large rewrites to human review.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">All 23 offline tests passed, including changed return values, invalid proposals, malformed issue records and comment/string false positives. Static checks do not establish runtime correctness.</div></div>
+<div class="project-links"><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module5tinker-bughound-starter" target="_blank" rel="noopener">View Project &amp; Code</a><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module5tinker-bughound-starter/tree/main/tests" target="_blank" rel="noopener">View Tests</a></div>
+</div>
+
+<div class="project-card" id="project-docubot">
+<span class="tag">Python · Retrieval · Evidence Evaluation</span>
+<h3>DocuBot: Source-Aware Documentation Retrieval</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Missing heading context and tied keyword scores can hide documentation that answers a developer question.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Added heading-aware sections, BM25 ranking, deterministic ties and separate source-evidence and refusal checks, with optional Gemini generation.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">All 18 tests passed. Seven bundled source/evidence cases and one unrelated refusal passed. These are development regression checks; live Gemini generation was not rerun.</div></div>
+<div class="project-links"><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module4tinker-docubot-starter" target="_blank" rel="noopener">View Project &amp; Code</a><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module4tinker-docubot-starter/tree/main/tests" target="_blank" rel="noopener">View Tests</a></div>
+</div>
+
+<div class="project-card" id="project-playlist-chaos">
+<span class="tag">Python · Streamlit · UI Testing</span>
+<h3>Playlist Chaos: Tested Playlist Explorer</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Inconsistent classification, incorrect collection statistics and empty selections made playlist exploration unreliable.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Fixed classification precedence, merge behavior, statistics and selection logic; added input feedback and Streamlit widget regression tests.</div></div>
+<div class="card-section"><div class="card-label">Impact</div><div class="card-body">All 25 logic and widget tests passed. Desktop screenshots were reviewed with the owner, who confirmed lucky-pick and history behavior.</div></div>
+<div class="project-links"><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module1tinker-playlistchaos-starter" target="_blank" rel="noopener">View Project &amp; Code</a><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module1tinker-playlistchaos-starter/tree/main/tests" target="_blank" rel="noopener">View Tests</a></div>
+</div>
 <div class="project-card"><span class="tag">Python · LLM Evaluation · Prompt Engineering</span><h3>Airline Refund Decisions: LLM Prompt Evaluation</h3><hr class="card-divider"/>
 <div class="card-section"><div class="card-label">Problem</div><div class="card-body">LLM-generated policy decisions can be incorrect despite valid formatting and can follow instructions embedded in untrusted case text.</div></div>
 <div class="card-section"><div class="card-label">Approach</div><div class="card-body">Adapted a 13-case synthetic refund-policy experiment comparing minimal, policy and policy-plus-examples prompts, with separate parsing, accuracy and injection checks.</div></div>
@@ -957,8 +987,21 @@
     });
     if (moveFocus) button.focus();
   }
+  function activateLinkedProject() {
+    const id = location.hash.slice(1);
+    const target = document.getElementById(id);
+    const button = tabs.find(tab => tab.dataset.tab === id ||
+      (target && document.getElementById(tab.dataset.tab).contains(target)));
+    if (button) activateTab(button);
+    if (target && target.classList.contains('project-card')) target.scrollIntoView({block: 'start'});
+  }
+  window.addEventListener('hashchange', activateLinkedProject);
+  activateLinkedProject();
   tabs.forEach((button, index) => {
-    button.addEventListener('click', () => activateTab(button));
+    button.addEventListener('click', () => {
+      activateTab(button);
+      history.replaceState(null, '', '#' + button.dataset.tab);
+    });
     button.addEventListener('keydown', event => {
       let next;
       if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
