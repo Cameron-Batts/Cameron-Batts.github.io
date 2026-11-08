@@ -383,6 +383,7 @@
 .card-img { height: 170px; object-fit: cover; object-position: top; }
 .project-card .card-body { margin-bottom: .55rem; }
 @media(max-width:700px) { .hero { grid-template-columns: 1fr; padding: 2.5rem 1.25rem; gap: 1.5rem; text-align: center; } .hero-photo { width: 144px; height: 144px; margin: auto; } .hero-text p { max-width: 100%; } .hero-ctas { justify-content: center; } }
+@media (min-width:601px) and (max-width:900px) { nav { height:auto; flex-wrap:wrap; padding:.6rem 1.25rem; } .nav-links { flex-wrap:wrap; } .nav-links a { height:40px; padding:0 .65rem; } }
 </style></head>
 <body>
 <!-- NAV -->
@@ -392,13 +393,15 @@
 <a href="#work">All Projects</a>
 <a href="#featured">Featured Projects</a>
 <a href="#contact">Contact</a>
+<a href="https://www.linkedin.com/in/cameron-batts/" rel="noopener" target="_blank">LinkedIn</a>
+<a href="https://github.com/Cameron-Batts" rel="noopener" target="_blank">GitHub</a>
 <a href="Cameron_Batts_Resume_PDF.pdf" rel="noopener" target="_blank">Resume</a>
 </div>
 </nav>
 <!-- HERO -->
 <section class="hero">
 <img alt="Cameron Batts" class="hero-photo" src="headshot.jpg"/>
-<div class="hero-text"><h1>Turning Data Into Decisions</h1><p class="subtitle">Senior Healthcare Operations Manager</p><p>I bring 15+ years of healthcare and military operations experience to data analytics, building dashboards, models and decision tools for operational decisions.</p><p>Explore my work in Power BI, Tableau, Python, R and SAS Viya. Open to data and visual analytics roles.</p><div class="hero-ctas">
+<div class="hero-text"><h1>Turning Data Into Decisions</h1><p class="subtitle">Senior Healthcare Operations Manager</p><p>I bring 15+ years of large-scale healthcare operations experience to data analytics, using dashboards, performance metrics and analytical models to support workforce planning, resource allocation and process improvement.</p><p>Explore my work in Power BI, Tableau, Python, R, SQL and SAS Viya. I’m building expertise in healthcare analytics, business intelligence and technical program management while serving on active duty. My civilian transition will be in 2029 at the earliest.</p><div class="hero-ctas">
 <a class="btn btn-primary" href="#featured">View Featured Projects</a>
 <a class="btn btn-outline" href="Cameron_Batts_Resume_PDF.pdf" rel="noopener" target="_blank">Resume</a>
 </div></div>
@@ -425,23 +428,34 @@
 </section>
 <!-- FEATURED PROJECT -->
 <section class="section" id="featured" style="border-top: 1px solid var(--gray-100);">
-<h2 class="section-title">Featured Projects</h2><div class="projects-grid"><div class="project-card"><img alt="Playlist Chaos live app preview" class="card-img" loading="lazy" src="playlist_preview.jpg?v=2"/>
+<h2 class="section-title">Featured Projects</h2><div class="projects-grid"><div class="project-card"><img alt="Retail sales analysis report preview" class="card-img" loading="lazy" src="retail_preview.jpg"/><span class="tag">Python • Business Analytics</span><h3>Retail Sales Analysis</h3><hr class="card-divider"/><div class="card-section"><div class="card-label">Problem</div><div class="card-body">Compare nonholiday weekly sales across 45 stores.</div></div><div class="card-section"><div class="card-label">Approach</div><div class="card-body">Validated joins and aggregated 421,570 sales records using Python and pandas.</div></div><div class="card-section"><div class="card-label">Results</div><div class="card-body">Average store-week sales: Type A $1.370M, B $816,922 and C $472,742. Descriptive comparisons, not causal effects.</div></div><div class="project-links"><a class="project-link" href="retail_sales_analysis.html">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Retail-Sales-Analysis" rel="noopener" target="_blank">View Code</a></div></div>
+<div class="project-card"><img alt="Financial sentiment model test accuracy comparison" class="card-img" loading="lazy" src="financial_sentiment_preview.svg"/>
+<span class="tag">Python · NLP · BERT · Fine-Tuning</span>
+<h3>Financial Sentiment Classification with BERT Fine-Tuning</h3>
+<hr class="card-divider"/>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Classify sentiment in financial news.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Compared baseline classifiers and BERT adaptations on a 2,423-sentence sample.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Fine-tuned BERT: 84.1% test accuracy and 0.82 macro F1, versus 76.1% and 0.64 for logistic regression. Duplicate texts limit evaluation independence.</div></div>
+<div class="project-links"><a class="project-link" href="financial_sentiment_bert.html" rel="noopener" target="_blank">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Financial-Sentiment-BERT-Finetuning" rel="noopener" target="_blank">View Code</a></div>
+</div>
+<div class="project-card"><img alt="Bank marketing analysis report preview" class="card-img" loading="lazy" src="bank_preview.jpg"/><span class="tag">Python • Machine Learning</span><h3>Bank Marketing Prediction</h3><hr class="card-divider"/><div class="card-section"><div class="card-label">Problem</div><div class="card-body">Compare customer targeting strategies for a deposit campaign.</div></div><div class="card-section"><div class="card-label">Approach</div><div class="card-body">Evaluated AdaBoost, decision trees and a tuned random forest using a campaign value function.</div></div><div class="card-section"><div class="card-label">Results</div><div class="card-body">Random forest yielded €57,190 in simulated test-set payoff under fixed assumptions; not realized profit.</div></div><div class="project-links"><a class="project-link" href="bank_marketing_prediction.html">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Bank-Marketing-Prediction" rel="noopener" target="_blank">View Code</a></div></div>
+<div class="project-card"><img alt="Playlist Chaos live app preview" class="card-img" loading="lazy" src="playlist_preview.jpg?v=2"/>
 <span class="tag">Python · Streamlit · UI Testing</span>
 <h3>Playlist Chaos: Tested Playlist Explorer</h3>
 <hr class="card-divider"/>
-<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Inconsistent classification, incorrect collection statistics and empty selections made playlist exploration unreliable.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Fixed classification precedence, merge behavior, statistics and selection logic; added input feedback and Streamlit widget regression tests.</div></div>
-<div class="card-section"><div class="card-label">Results</div><div class="card-body">All 25 logic and widget tests passed. The public demo also passed a live lucky-pick and history check.</div></div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Make playlist filtering and song selection reliable.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Corrected classification, statistics and selection logic; added input validation and widget tests.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Passed 25 logic and widget tests; includes a public Streamlit demo.</div></div>
 <div class="project-links"><a class="project-link" href="playlist-chaos.html" rel="noopener" target="_blank">Try Live Demo</a><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module1tinker-playlistchaos-starter" rel="noopener" target="_blank">View Project &amp; Code</a><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module1tinker-playlistchaos-starter/tree/main/tests" rel="noopener" target="_blank">View Tests</a></div>
-</div><div class="project-card"><img alt="Power BI healthcare dashboard preview" class="card-img" src="powerbi_dashboard.png"/><span class="tag">Power BI · Healthcare Operations</span><h3>Healthcare Operations &amp; Workforce Analytics Dashboard</h3><hr class="card-divider"/><div class="card-section"><div class="card-label">Problem</div><div class="card-body">Bring together personnel coverage, qualifications, inbound/outbound staffing and access-to-care views for healthcare operations.</div></div><div class="card-section"><div class="card-label">Approach</div><div class="card-body">Built a multi-page dashboard for workforce, qualifications, inbound/outbound staffing and access-to-care views; reviewed the supplied static export.</div></div><div class="card-section"><div class="card-label">Results</div><div class="card-body">Demonstrates an integrated reporting view. The 85-person headline differs from the 96-count category and department views; definitions and snapshot scopes need reconciliation. Operational improvements have not been measured.</div></div><div class="project-links"><a class="project-link" href="powerbi_healthcare_operations.html" rel="noopener" target="_blank">View Analysis</a><a class="project-link" href="FlightDashboard.pdf" rel="noopener" target="_blank">View Export</a></div></div><div class="project-card"><img alt="Retail sales analysis report preview" class="card-img" loading="lazy" src="retail_preview.jpg"/><span class="tag">Python • Business Analytics</span><h3>Retail Sales Analysis</h3><hr class="card-divider"/><div class="card-section"><div class="card-label">Problem</div><div class="card-body">Compare retail performance across store types using consistent store-week sales summaries.</div></div><div class="card-section"><div class="card-label">Approach</div><div class="card-body">Validated the store join, excluded holiday weeks and aggregated department sales with pandas.</div></div><div class="card-section"><div class="card-label">Results</div><div class="card-body">Average nonholiday store-week sales were $1.370M for Type A, $816,922 for Type B and $472,742 for Type C. These are descriptive comparisons.</div></div><div class="project-links"><a class="project-link" href="retail_sales_analysis.html">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Retail-Sales-Analysis" rel="noopener" target="_blank">View Code</a></div></div><div class="project-card"><img alt="Bank marketing analysis report preview" class="card-img" loading="lazy" src="bank_preview.jpg"/><span class="tag">Python • Machine Learning</span><h3>Bank Marketing Prediction</h3><hr class="card-divider"/><div class="card-section"><div class="card-label">Problem</div><div class="card-body">Identify likely term-deposit subscribers and compare campaign decisions under explicit payoff assumptions.</div></div><div class="card-section"><div class="card-label">Approach</div><div class="card-body">Compared AdaBoost, decision trees and a tuned random forest using a custom campaign value function.</div></div><div class="card-section"><div class="card-label">Results</div><div class="card-body">The tuned random forest produced a €57,190 simulated test-set payoff under fixed assumptions. This is not realized profit; evaluation limits are documented in the report.</div></div><div class="project-links"><a class="project-link" href="bank_marketing_prediction.html">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Bank-Marketing-Prediction" rel="noopener" target="_blank">View Code</a></div></div>
+</div>
 <div class="project-card">
 <img alt="SAS US Aviation Industry Trends" class="card-img" src="aviation_passengers_dashboard.png"/>
 <span class="tag">SAS Viya • Industry Trends</span>
 <h3>U.S. Aviation Industry Trends Analysis</h3>
 <hr class="card-divider"/>
-<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Examine the 2020 disruption in passenger traffic, employment and quarterly airline finances.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the SAS PDF and independently parse all five included CSV tables. Calculate matched-month passenger changes, the latest observed workforce change and Q3 2019-to-Q3 2020 revenue changes. Treat SAS dots as missing values.</div></div>
-<div class="card-section"><div class="card-label">Results</div><div class="card-body">Quantifies the disruption from included data while separating observations, missing values and unvalidated forecasts.</div></div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Assess aviation disruption during 2020.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Analyzed passenger traffic, employment and revenue using SAS Viya and five CSV tables.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Compared passenger, workforce and revenue changes while separating missing data and unvalidated forecasts.</div></div>
 <div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" rel="noopener" target="_blank">View Analysis</a>
 <a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" rel="noopener" target="_blank">View Code</a></div>
 </div>
@@ -450,9 +464,9 @@
 <span class="tag">SAS Viya • Acquisition Analytics</span>
 <h3>Megacorp Acquisition Analysis</h3>
 <hr class="card-divider"/>
-<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational reliability, facility geography and product-line profit in a fictional acquisition scenario.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review Exploration, Geography and Profit Analysis pages, including the PDF appendix that records object-specific year filters. Separate the headline KPI from the year-filtered product and trend objects.</div></div>
-<div class="card-section"><div class="card-label">Results</div><div class="card-body">Highlights loss-making product lines and the need to reconcile KPI filter scopes before interpreting acquisition risk.</div></div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational and financial acquisition risks in a fictional company.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Reviewed reliability, facility geography and product-line profit using SAS Viya.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Identified loss-making product lines and KPI filter differences that need reconciliation.</div></div>
 <div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" rel="noopener" target="_blank">View Analysis</a>
 <a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" rel="noopener" target="_blank">View Code</a></div>
 </div>
@@ -641,9 +655,9 @@
 <span class="tag">Python · Streamlit · UI Testing</span>
 <h3>Playlist Chaos: Tested Playlist Explorer</h3>
 <hr class="card-divider"/>
-<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Inconsistent classification, incorrect collection statistics and empty selections made playlist exploration unreliable.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Fixed classification precedence, merge behavior, statistics and selection logic; added input feedback and Streamlit widget regression tests.</div></div>
-<div class="card-section"><div class="card-label">Results</div><div class="card-body">All 25 logic and widget tests passed. The public demo also passed a live lucky-pick and history check.</div></div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Make playlist filtering and song selection reliable.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Corrected classification, statistics and selection logic; added input validation and widget tests.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Passed 25 logic and widget tests; includes a public Streamlit demo.</div></div>
 <div class="project-links"><a class="project-link" href="playlist-chaos.html" rel="noopener" target="_blank">Try Live Demo</a><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module1tinker-playlistchaos-starter" rel="noopener" target="_blank">View Project &amp; Code</a><a class="project-link" href="https://github.com/Cameron-Batts/ai110-module1tinker-playlistchaos-starter/tree/main/tests" rel="noopener" target="_blank">View Tests</a></div>
 </div>
 <div class="project-card"><span class="tag">Python · LLM Evaluation · Prompt Engineering</span><h3>Airline Refund Decisions: LLM Prompt Evaluation</h3><hr class="card-divider"/>
@@ -664,9 +678,9 @@
 <span class="tag">Python · NLP · BERT · Fine-Tuning</span>
 <h3>Financial Sentiment Classification with BERT Fine-Tuning</h3>
 <hr class="card-divider"/>
-<div class="card-section"><div class="card-label">Problem</div><div class="card-body">General sentiment models can struggle with financial language, while class imbalance obscures errors on positive and negative news.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Compared bag-of-words baselines, pretrained BERT, head-only adaptation and full fine-tuning on a 2,423-sentence sample with separate training, validation and test splits.</div></div>
-<div class="card-section"><div class="card-label">Results</div><div class="card-body">In the MPS rerun, full fine-tuning reached 84.1% test accuracy and macro F1 of 0.82, versus 76.1% and 0.64 for logistic regression. Duplicate texts limit evaluation independence. External FinBERT remains a separate comparison.</div></div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Classify sentiment in financial news.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Compared baseline classifiers and BERT adaptations on a 2,423-sentence sample.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Fine-tuned BERT: 84.1% test accuracy and 0.82 macro F1, versus 76.1% and 0.64 for logistic regression. Duplicate texts limit evaluation independence.</div></div>
 <div class="project-links"><a class="project-link" href="financial_sentiment_bert.html" rel="noopener" target="_blank">View Analysis</a><a class="project-link" href="https://github.com/Cameron-Batts/Financial-Sentiment-BERT-Finetuning" rel="noopener" target="_blank">View Code</a></div>
 </div>
 <div class="project-card">
@@ -870,9 +884,9 @@
 <span class="tag">SAS Viya  ·  Visual Analytics  ·  Industry Trends</span>
 <h3>U.S. Aviation Industry Trends Analysis</h3>
 <hr class="card-divider"/>
-<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Examine the 2020 disruption in passenger traffic, employment and quarterly airline finances.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review the SAS PDF and independently parse all five included CSV tables. Calculate matched-month passenger changes, the latest observed workforce change and Q3 2019-to-Q3 2020 revenue changes. Treat SAS dots as missing values.</div></div>
-<div class="card-section"><div class="card-label">Results</div><div class="card-body">Quantifies the disruption from included data while separating observations, missing values and unvalidated forecasts.</div></div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Assess aviation disruption during 2020.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Analyzed passenger traffic, employment and revenue using SAS Viya and five CSV tables.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Compared passenger, workforce and revenue changes while separating missing data and unvalidated forecasts.</div></div>
 <div class="project-links"><a class="project-link" href="sas_us_aviation_industry_trends.html" rel="noopener" target="_blank">View Analysis</a>
 <a class="project-link" href="https://github.com/Cameron-Batts/SAS-US-Aviation-Industry-Trends" rel="noopener" target="_blank">View Code</a></div>
 </div>
@@ -881,9 +895,9 @@
 <span class="tag">SAS Viya  ·  Visual Analytics  ·  Acquisition Analytics</span>
 <h3>Megacorp Acquisition Analysis</h3>
 <hr class="card-divider"/>
-<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational reliability, facility geography and product-line profit in a fictional acquisition scenario.</div></div>
-<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Review Exploration, Geography and Profit Analysis pages, including the PDF appendix that records object-specific year filters. Separate the headline KPI from the year-filtered product and trend objects.</div></div>
-<div class="card-section"><div class="card-label">Results</div><div class="card-body">Highlights loss-making product lines and the need to reconcile KPI filter scopes before interpreting acquisition risk.</div></div>
+<div class="card-section"><div class="card-label">Problem</div><div class="card-body">Explore operational and financial acquisition risks in a fictional company.</div></div>
+<div class="card-section"><div class="card-label">Approach</div><div class="card-body">Reviewed reliability, facility geography and product-line profit using SAS Viya.</div></div>
+<div class="card-section"><div class="card-label">Results</div><div class="card-body">Identified loss-making product lines and KPI filter differences that need reconciliation.</div></div>
 <div class="project-links"><a class="project-link" href="sas_megacorp_acquisition.html" rel="noopener" target="_blank">View Analysis</a>
 <a class="project-link" href="https://github.com/Cameron-Batts/SAS-Megacorp-Acquisition-Analysis" rel="noopener" target="_blank">View Code</a></div>
 </div>
@@ -963,7 +977,7 @@
 <section id="contact" style="background: #fff; border-top: 1px solid var(--gray-100);">
 <div class="section">
 <h2 class="section-title">Connect</h2>
-<p style="color: var(--text-muted); font-size: .9rem; margin-bottom: 1.5rem;">Open to connecting on data analytics, healthcare operations, and opportunities focused on data driven decision making.</p>
+<p style="color: var(--text-muted); font-size: .9rem; margin-bottom: 1.5rem;">Connect with me about healthcare analytics, business intelligence and technical program management. I’m currently serving on active duty and building professional connections ahead of a civilian transition in 2029 at the earliest.</p>
 <div class="contact-row">
 <a class="contact-item" href="mailto:cameron.batts1@gmail.com">
 <div class="contact-icon">✉</div>
